@@ -132,6 +132,7 @@ func (s *Server) HandlerInitiate(w http.ResponseWriter, r *http.Request) {
 
 	conf.RedirectURL = callback
 	session.Values = map[interface{}]interface{}{}
+	session.Values["provider"] = s.DefaultPrivider
 	session.Values["callback"] = callback
 	session.Values["next"] = next
 	session.Values["state"] = state
@@ -148,10 +149,16 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conf := s.ProviderConfigs[s.DefaultPrivider].Config()
-
 	var val interface{}
 	var ok bool
+
+	var provider string
+	val = session.Values["provider"]
+	if provider, ok = val.(string); !ok {
+		fmt.Println("provider is not set")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 
 	var callback string
 	val = session.Values["callback"]
@@ -160,7 +167,6 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	conf.RedirectURL = callback
 
 	var next string
 	val = session.Values["next"]
@@ -177,6 +183,9 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+
+	conf := s.ProviderConfigs[provider].Config()
+	conf.RedirectURL = callback
 
 	query := r.URL.Query()
 

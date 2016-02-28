@@ -2,7 +2,6 @@ package adapter
 
 import (
 	"flag"
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -24,7 +23,6 @@ func Main() {
 			panic(err)
 		}
 	}
-	fmt.Println(c)
 	s, err := NewServer(*c)
 	if err != nil {
 		panic(err)
