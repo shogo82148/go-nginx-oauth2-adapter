@@ -1,9 +1,11 @@
 package adapter
 
 import (
+	"encoding/gob"
 	"fmt"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/sessions"
 
@@ -13,18 +15,24 @@ import (
 const DefaultSessionName = "go-nginx-oauth2-session"
 
 type Config struct {
-	Host        string                            `yaml:"host", json:"host"`
-	Port        string                            `yaml:"port", json:"port"`
-	Secret      string                            `yaml:"secret", json:"scret"`
-	SessionName string                            `yaml:"session_name", json:"session_name"`
-	Providers   map[string]map[string]interface{} `yaml:"providers", json:"providers"`
+	Host               string                            `yaml:"host", json:"host"`
+	Port               string                            `yaml:"port", json:"port"`
+	Secret             string                            `yaml:"secret", json:"scret"`
+	SessionName        string                            `yaml:"session_name", json:"session_name"`
+	Providers          map[string]map[string]interface{} `yaml:"providers", json:"providers"`
+	AppRefreshInterval string                            `yaml:"app_refresh_interval", json:"app_refresh_interval"`
 }
 
 type Server struct {
-	Config          Config
-	DefaultPrivider string
-	ProviderConfigs map[string]ProviderConfig
-	SessionStore    sessions.Store
+	Config             Config
+	DefaultPrivider    string
+	ProviderConfigs    map[string]ProviderConfig
+	SessionStore       sessions.Store
+	AppRefreshInterval time.Duration
+}
+
+func init() {
+	gob.Register(time.Time{})
 }
 
 func Main() {
@@ -67,6 +75,16 @@ func NewServer(config Config) (*Server, error) {
 		s.Config.SessionName = DefaultSessionName
 	}
 
+	if s.Config.AppRefreshInterval == "" {
+		s.AppRefreshInterval = 24 * time.Hour
+	} else {
+		var err error
+		s.AppRefreshInterval, err = time.ParseDuration(s.Config.AppRefreshInterval)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return s, nil
 }
 
@@ -94,7 +112,24 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // HandlerTest validates the session.
 func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+	session, err := s.SessionStore.Get(r, s.Config.SessionName)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
+	var val interface{}
+	var ok bool
+	var logged_in_at time.Time
+	val = session.Values["logged_in_at"]
+	if logged_in_at, ok = val.(time.Time); !ok {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+
+	if time.Now().Sub(logged_in_at) > s.AppRefreshInterval {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
 }
 
 // HandlerInitiate redirects to authorization page.
@@ -133,7 +168,7 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	val = session.Values["callback"]
 	if callback, ok = val.(string); !ok {
 		fmt.Println("callback is not set")
-		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 	conf.RedirectURL = callback
@@ -142,7 +177,7 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	val = session.Values["next"]
 	if next, ok = val.(string); !ok {
 		fmt.Println("next is not set")
-		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
@@ -153,6 +188,8 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 		return
 	}
+
+	session.Values["logged_in_at"] = time.Now()
 
 	_ = t
 
