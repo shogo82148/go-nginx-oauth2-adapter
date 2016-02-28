@@ -8,7 +8,11 @@ import (
 func Main() {
 	rand.Seed(time.Now().UnixNano())
 
-	s, err := NewServer(Config{})
+	c := NewConfig()
+	if err := c.LoadEnv(); err != nil {
+		panic(err)
+	}
+	s, err := NewServer(*c)
 	if err != nil {
 		panic(err)
 	}

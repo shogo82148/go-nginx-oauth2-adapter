@@ -18,17 +18,6 @@ import (
 
 var ErrProviderConfigNotFound = errors.New("shogo82148/go-nginx-oauth2-adapter: provider configure not found")
 
-const DefaultSessionName = "go-nginx-oauth2-session"
-
-type Config struct {
-	Host               string                            `yaml:"host", json:"host"`
-	Port               string                            `yaml:"port", json:"port"`
-	Secret             string                            `yaml:"secret", json:"scret"`
-	SessionName        string                            `yaml:"session_name", json:"session_name"`
-	Providers          map[string]map[string]interface{} `yaml:"providers", json:"providers"`
-	AppRefreshInterval string                            `yaml:"app_refresh_interval", json:"app_refresh_interval"`
-}
-
 type Server struct {
 	Config             Config
 	DefaultPrivider    string
@@ -75,10 +64,6 @@ func NewServer(config Config) (*Server, error) {
 
 	s.SessionStore = sessions.NewCookieStore([]byte(config.Secret))
 
-	if s.Config.SessionName == "" {
-		s.Config.SessionName = DefaultSessionName
-	}
-
 	if s.Config.AppRefreshInterval == "" {
 		s.AppRefreshInterval = 24 * time.Hour
 	} else {
@@ -95,9 +80,6 @@ func NewServer(config Config) (*Server, error) {
 func (s *Server) ListenAndServe() error {
 	host := s.Config.Host
 	port := s.Config.Port
-	if port == "" {
-		port = "18080"
-	}
 	return http.ListenAndServe(net.JoinHostPort(host, port), s)
 }
 
@@ -118,7 +100,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 	session, err := s.SessionStore.Get(r, s.Config.SessionName)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		// session is broken. trigger authorization for fix it
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
 	}
 
 	var val interface{}
@@ -138,10 +122,8 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 
 // HandlerInitiate redirects to authorization page.
 func (s *Server) HandlerInitiate(w http.ResponseWriter, r *http.Request) {
-	session, err := s.SessionStore.Get(r, s.Config.SessionName)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	}
+	// ignore error bacause we don't need privious session values.
+	session, _ := s.SessionStore.Get(r, s.Config.SessionName)
 
 	conf := s.ProviderConfigs[s.DefaultPrivider].Config()
 	callback := r.Header.Get("x-ngx-omniauth-initiate-callback")
@@ -149,6 +131,7 @@ func (s *Server) HandlerInitiate(w http.ResponseWriter, r *http.Request) {
 	state := generateNewState()
 
 	conf.RedirectURL = callback
+	session.Values = map[interface{}]interface{}{}
 	session.Values["callback"] = callback
 	session.Values["next"] = next
 	session.Values["state"] = state
@@ -162,6 +145,7 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	session, err := s.SessionStore.Get(r, s.Config.SessionName)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	conf := s.ProviderConfigs[s.DefaultPrivider].Config()
