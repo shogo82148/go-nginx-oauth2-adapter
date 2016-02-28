@@ -1,8 +1,12 @@
 package adapter
 
 import (
+	crand "crypto/rand"
+	"encoding/base64"
 	"encoding/gob"
+	"errors"
 	"fmt"
+	"math/rand"
 	"net"
 	"net/http"
 	"time"
@@ -11,6 +15,8 @@ import (
 
 	"golang.org/x/oauth2"
 )
+
+var ErrProviderConfigNotFound = errors.New("shogo82148/go-nginx-oauth2-adapter: provider configure not found")
 
 const DefaultSessionName = "go-nginx-oauth2-session"
 
@@ -35,15 +41,6 @@ func init() {
 	gob.Register(time.Time{})
 }
 
-func Main() {
-	s, err := NewServer(Config{})
-	if err != nil {
-		panic(err)
-	}
-
-	s.ListenAndServe()
-}
-
 func NewServer(config Config) (*Server, error) {
 	s := &Server{
 		Config:          config,
@@ -62,11 +59,18 @@ func NewServer(config Config) (*Server, error) {
 			conf = map[string]interface{}{}
 		}
 		providerConfig, err := provider.ParseConfig(conf)
-		if err != nil {
+		if err != nil && err != ErrProviderConfigNotFound {
 			return nil, err
 		}
 		s.ProviderConfigs[name] = providerConfig
+		if s.DefaultPrivider != "" {
+			return nil, errors.New("shogo82148/go-nginx-oauth2-adapter: multiple providers are not supported")
+		}
 		s.DefaultPrivider = name
+	}
+
+	if s.DefaultPrivider == "" {
+		return nil, ErrProviderConfigNotFound
 	}
 
 	s.SessionStore = sessions.NewCookieStore([]byte(config.Secret))
@@ -142,14 +146,15 @@ func (s *Server) HandlerInitiate(w http.ResponseWriter, r *http.Request) {
 	conf := s.ProviderConfigs[s.DefaultPrivider].Config()
 	callback := r.Header.Get("x-ngx-omniauth-initiate-callback")
 	next := r.Header.Get("x-ngx-omniauth-initiate-back-to")
+	state := generateNewState()
 
 	conf.RedirectURL = callback
 	session.Values["callback"] = callback
 	session.Values["next"] = next
+	session.Values["state"] = state
 	session.Save(r, w)
 
-	// TODO: state is recommended
-	http.Redirect(w, r, conf.AuthCodeURL(""), http.StatusFound)
+	http.Redirect(w, r, conf.AuthCodeURL(state), http.StatusFound)
 }
 
 // HandlerCallback validates the user infomation, set to cookie
@@ -181,7 +186,23 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code := r.URL.Query().Get("code")
+	var state string
+	val = session.Values["state"]
+	if state, ok = val.(string); !ok {
+		fmt.Println("state is not set")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	query := r.URL.Query()
+
+	if state != query.Get("state") {
+		fmt.Println("state is not correct")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	code := query.Get("code")
 	t, err := conf.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		fmt.Println(err)
@@ -195,4 +216,16 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 
 	session.Save(r, w)
 	http.Redirect(w, r, next, http.StatusFound)
+}
+
+// generateNewState generate secure random state
+func generateNewState() string {
+	data := make([]byte, 32)
+	if n, err := crand.Read(data); err != nil || n != len(data) {
+		// fallback insecure pseudo random
+		for i := range data {
+			data[i] = byte(rand.Intn(256))
+		}
+	}
+	return base64.URLEncoding.EncodeToString(data)
 }

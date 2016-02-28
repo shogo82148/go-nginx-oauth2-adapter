@@ -24,6 +24,10 @@ func (_ providerGoogle) ParseConfig(configFile map[string]interface{}) (adapter.
 		Scopes:       []string{"email"},
 	}
 
+	if c.baseConfig.ClientID == "" || c.baseConfig.ClientSecret == "" {
+		return nil, adapter.ErrProviderConfigNotFound
+	}
+
 	return c, nil
 }
 
