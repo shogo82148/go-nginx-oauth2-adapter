@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"net"
 	"net/http"
 	"time"
 
@@ -76,12 +75,6 @@ func NewServer(config Config) (*Server, error) {
 	}
 
 	return s, nil
-}
-
-func (s *Server) ListenAndServe() error {
-	host := s.Config.Host
-	port := s.Config.Port
-	return http.ListenAndServe(net.JoinHostPort(host, port), s)
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
