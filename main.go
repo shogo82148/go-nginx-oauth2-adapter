@@ -2,7 +2,6 @@ package adapter
 
 import (
 	"flag"
-	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -10,30 +9,43 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/lestrrat/go-server-starter/listener"
 	"github.com/shogo82148/go-gracedown"
 )
 
 func Main() {
-	log.Printf("start pid %d\n", os.Getpid())
 	rand.Seed(time.Now().UnixNano())
 
-	c := parseConfig()
+	c, err := parseConfig()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Fatal("error while parsing configure")
+		os.Exit(1)
+	}
+
 	startWatchSignal()
 	l, err := getListener(c)
 	if err != nil {
-		panic(err)
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Fatal("listen error")
+		os.Exit(1)
 	}
 
 	s, err := NewServer(*c)
 	if err != nil {
-		panic(err)
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Fatal("init server error")
+		os.Exit(1)
 	}
 
-	gracedown.Serve(l, s)
+	gracedown.Serve(l, LoggingHandler(s))
 }
 
-func parseConfig() *Config {
+func parseConfig() (*Config, error) {
 	var configFile string
 	flag.StringVar(&configFile, "c", "", "configuration file")
 	flag.StringVar(&configFile, "config", "", "configuration file")
@@ -41,15 +53,15 @@ func parseConfig() *Config {
 
 	c := NewConfig()
 	if err := c.LoadEnv(); err != nil {
-		panic(err)
+		return nil, err
 	}
 	if configFile != "" {
 		if err := c.LoadYaml(configFile); err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
-	return c
+	return c, nil
 }
 
 func startWatchSignal() {
@@ -59,7 +71,7 @@ func startWatchSignal() {
 		for {
 			s := <-signal_chan
 			if s == syscall.SIGTERM {
-				log.Printf("SIGTERM!!!!\n")
+				logrus.Info("received SIGTERM")
 				gracedown.Close()
 			}
 		}

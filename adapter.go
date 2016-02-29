@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
 
 	"golang.org/x/oauth2"
@@ -94,7 +95,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 	session, err := s.SessionStore.Get(r, s.Config.SessionName)
 	if err != nil {
-		// session is broken. trigger authorization for fix it
+		// session is broken. retrigger authorization for fix it
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Info("session is broken. trigger reauthorization for fix it.")
+
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
@@ -105,13 +110,15 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 	var logged_in_at time.Time
 	val = session.Values["logged_in_at"]
 	if logged_in_at, ok = val.(time.Time); !ok {
-		fmt.Println("logged_in_at is not set")
+		logrus.WithFields(logrus.Fields{
+			"err": "logged_in_at is not found",
+		}).Info("session is broken. trigger reauthorization for fix it.")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 
 	if time.Now().Sub(logged_in_at) > s.AppRefreshInterval {
-		fmt.Println("session is expired")
+		logrus.Info("session is expired. trigger reauthorization for fix it.")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
@@ -120,7 +127,9 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 	var provider string
 	val = session.Values["provider"]
 	if provider, ok = val.(string); !ok {
-		fmt.Println("provider is not set")
+		logrus.WithFields(logrus.Fields{
+			"err": "provider is not found",
+		}).Info("session is broken. trigger reauthorization for fix it.")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
@@ -129,7 +138,9 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 	var uid string
 	val = session.Values["uid"]
 	if uid, ok = val.(string); !ok {
-		fmt.Println("uid is not set")
+		logrus.WithFields(logrus.Fields{
+			"err": "uid is not found",
+		}).Info("session is broken. trigger reauthorization for fix it.")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
@@ -138,11 +149,15 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 	var info string
 	val = session.Values["info"]
 	if info, ok = val.(string); !ok {
-		fmt.Println("info is not set")
+		logrus.WithFields(logrus.Fields{
+			"err": "info is not found",
+		}).Info("session is broken. trigger reauthorization for fix it.")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 	w.Header().Add("x-ngx-omniauth-info", info)
+
+	fmt.Fprint(w, "")
 }
 
 // HandlerInitiate redirects to authorization page.
