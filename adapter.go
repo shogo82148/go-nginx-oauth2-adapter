@@ -4,6 +4,7 @@ import (
 	crand "crypto/rand"
 	"encoding/base64"
 	"encoding/gob"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -105,19 +106,50 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check when the user has started the session.
 	var val interface{}
 	var ok bool
 	var logged_in_at time.Time
 	val = session.Values["logged_in_at"]
 	if logged_in_at, ok = val.(time.Time); !ok {
+		fmt.Println("logged_in_at is not set")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 
 	if time.Now().Sub(logged_in_at) > s.AppRefreshInterval {
+		fmt.Println("session is expired")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
+
+	// send the user information to the application server.
+	var provider string
+	val = session.Values["provider"]
+	if provider, ok = val.(string); !ok {
+		fmt.Println("provider is not set")
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	w.Header().Add("x-ngx-omniauth-provider", provider)
+
+	var uid string
+	val = session.Values["uid"]
+	if uid, ok = val.(string); !ok {
+		fmt.Println("uid is not set")
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	w.Header().Add("x-ngx-omniauth-user", uid)
+
+	var info string
+	val = session.Values["info"]
+	if info, ok = val.(string); !ok {
+		fmt.Println("info is not set")
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	w.Header().Add("x-ngx-omniauth-info", info)
 }
 
 // HandlerInitiate redirects to authorization page.
@@ -203,11 +235,20 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	uid, info, err := s.ProviderConfigs[provider].Info(&conf, t)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	session.Values["uid"] = uid
+	session.Values["info"] = encodeInfo(info)
 	session.Values["logged_in_at"] = time.Now()
 
-	_ = t
-
-	session.Save(r, w)
+	if err := session.Save(r, w); err != nil {
+		fmt.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 	http.Redirect(w, r, next, http.StatusFound)
 }
 
@@ -221,4 +262,10 @@ func generateNewState() string {
 		}
 	}
 	return base64.URLEncoding.EncodeToString(data)
+}
+
+// encodeInfo encodes the user information for embeding to http header.
+func encodeInfo(info map[string]interface{}) string {
+	data, _ := json.Marshal(info)
+	return base64.StdEncoding.EncodeToString(data)
 }

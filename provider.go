@@ -8,6 +8,7 @@ type Provider interface {
 
 type ProviderConfig interface {
 	Config() oauth2.Config
+	Info(c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error)
 }
 
 var providers map[string]Provider = map[string]Provider{}
