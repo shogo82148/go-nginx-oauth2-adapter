@@ -195,7 +195,9 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	var provider string
 	val = session.Values["provider"]
 	if provider, ok = val.(string); !ok {
-		fmt.Println("provider is not set")
+		logrus.WithFields(logrus.Fields{
+			"err": "provider is not found",
+		}).Info("session is broken.")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -203,7 +205,9 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	var callback string
 	val = session.Values["callback"]
 	if callback, ok = val.(string); !ok {
-		fmt.Println("callback is not set")
+		logrus.WithFields(logrus.Fields{
+			"err": "callback is not found",
+		}).Info("session is broken.")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -211,7 +215,9 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	var next string
 	val = session.Values["next"]
 	if next, ok = val.(string); !ok {
-		fmt.Println("next is not set")
+		logrus.WithFields(logrus.Fields{
+			"err": "next is not found",
+		}).Info("session is broken.")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -219,7 +225,9 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	var state string
 	val = session.Values["state"]
 	if state, ok = val.(string); !ok {
-		fmt.Println("state is not set")
+		logrus.WithFields(logrus.Fields{
+			"err": "state is not found",
+		}).Info("session is broken.")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -230,7 +238,9 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 
 	if state != query.Get("state") {
-		fmt.Println("state is not correct")
+		logrus.WithFields(logrus.Fields{
+			"err": "state is not correct",
+		}).Info("session is broken.")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -238,25 +248,44 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	code := query.Get("code")
 	t, err := conf.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		fmt.Println(err)
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Info("oauth verification faild")
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 		return
 	}
 
 	uid, info, err := s.ProviderConfigs[provider].Info(&conf, t)
 	if err != nil {
-		fmt.Println(err)
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Info("user info cannot get")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	jsonInfo, encodedInfo, err := encodeInfo(info)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Info("failed encoding info")
+	}
+
 	session.Values["uid"] = uid
-	session.Values["info"] = encodeInfo(info)
+	session.Values["info"] = encodedInfo
 	session.Values["logged_in_at"] = time.Now()
 
 	if err := session.Save(r, w); err != nil {
-		fmt.Println(err)
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Error("failed to save session")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"user": uid,
+		"info": jsonInfo,
+	}).Info("user login")
+
 	http.Redirect(w, r, next, http.StatusFound)
 }
 
@@ -273,7 +302,10 @@ func generateNewState() string {
 }
 
 // encodeInfo encodes the user information for embeding to http header.
-func encodeInfo(info map[string]interface{}) string {
-	data, _ := json.Marshal(info)
-	return base64.StdEncoding.EncodeToString(data)
+func encodeInfo(info map[string]interface{}) (string, string, error) {
+	data, err := json.Marshal(info)
+	if err != nil {
+		return "", "", err
+	}
+	return string(data), base64.StdEncoding.EncodeToString(data), nil
 }
