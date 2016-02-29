@@ -18,6 +18,7 @@ import (
 )
 
 var ErrProviderConfigNotFound = errors.New("shogo82148/go-nginx-oauth2-adapter: provider configure not found")
+var ErrForbidden = errors.New("shogo82148/go-nginx-oauth2-adapter/provider: access forbidden")
 
 type Server struct {
 	Config             Config
@@ -257,10 +258,17 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 
 	uid, info, err := s.ProviderConfigs[provider].Info(&conf, t)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"err": err.Error(),
-		}).Info("user info cannot get")
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		if err == ErrForbidden {
+			logrus.WithFields(logrus.Fields{
+				"err": err.Error(),
+			}).Warn("access forbidden")
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		} else {
+			logrus.WithFields(logrus.Fields{
+				"err": err.Error(),
+			}).Warn("user info cannot get")
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
 		return
 	}
 	jsonInfo, encodedInfo, err := encodeInfo(info)

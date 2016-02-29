@@ -15,6 +15,7 @@ type providerGoogle struct{}
 type providerConfigGoogle struct {
 	baseConfig     oauth2.Config
 	enabledProfile bool
+	domains        []string
 }
 type profileGoole struct {
 	Gender        string `json:"gender"`
@@ -65,6 +66,16 @@ func (_ providerGoogle) ParseConfig(configFile map[string]interface{}) (adapter.
 		return nil, adapter.ErrProviderConfigNotFound
 	}
 
+	if idomains, ok := configFile["domain"].([]interface{}); ok {
+		domains := make([]string, 0, len(idomains))
+		for _, d := range idomains {
+			if domain, ok := d.(string); ok {
+				domains = append(domains, domain)
+			}
+		}
+		c.domains = domains
+	}
+
 	return c, nil
 }
 
@@ -96,6 +107,28 @@ func (pc providerConfigGoogle) Info(c *oauth2.Config, t *oauth2.Token) (string, 
 		return "", nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: invalid id_token")
 	}
 	info["email"] = idType.Email
+
+	fmt.Println(pc.domains)
+	if len(pc.domains) > 0 {
+		valid := false
+		for _, d := range pc.domains {
+			fmt.Println(d)
+			if strings.Contains(d, "@") {
+				if d == idType.Email {
+					valid = true
+					break
+				}
+			} else {
+				if strings.HasSuffix(idType.Email, "@"+d) {
+					valid = true
+					break
+				}
+			}
+		}
+		if !valid {
+			return "", nil, adapter.ErrForbidden
+		}
+	}
 
 	// get detail of profile
 	if pc.enabledProfile {
