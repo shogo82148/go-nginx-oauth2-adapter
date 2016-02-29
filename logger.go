@@ -81,12 +81,13 @@ func (h loggingHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	url := *req.URL
 	h.handler.ServeHTTP(logger, req)
 	fields := logrus.Fields{
-		"uri":      url.String(),
-		"status":   logger.Status(),
-		"size":     logger.Size(),
-		"method":   req.Method,
-		"user":     logger.Header().Get("x-ngx-omniauth-user"),
-		"provider": logger.Header().Get("x-ngx-omniauth-provider"),
+		"uri":          url.String(),
+		"status":       logger.Status(),
+		"size":         logger.Size(),
+		"method":       req.Method,
+		"user":         logger.Header().Get("x-ngx-omniauth-user"),
+		"provider":     logger.Header().Get("x-ngx-omniauth-provider"),
+		"original_uri": req.Header.Get("x-ngx-omniauth-original-uri"),
 	}
 
 	end := time.Now()
