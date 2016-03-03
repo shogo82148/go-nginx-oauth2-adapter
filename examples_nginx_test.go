@@ -16,6 +16,8 @@ import (
 func testStartNginx() (*exec.Cmd, error) {
 	wd, _ := os.Getwd()
 	cmd := exec.Command("nginx", "-c", filepath.Join(wd, "examples", "nginx", "nginx.conf"))
+	cmd.Stdout = os.Stderr
+	cmd.Stderr = os.Stderr
 	return cmd, cmd.Start()
 }
 
