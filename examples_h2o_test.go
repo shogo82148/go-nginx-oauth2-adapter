@@ -16,6 +16,7 @@ import (
 func testStartH2O() (*exec.Cmd, error) {
 	wd, _ := os.Getwd()
 	os.Chdir(filepath.Join(wd, "examples", "h2o"))
+	defer os.Chdir(wd)
 	cmd := exec.Command("h2o", "-c", "h2o.conf")
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
@@ -56,6 +57,7 @@ func TestH2O(t *testing.T) {
 	go http.ListenAndServe(":18081", s)
 
 	go http.ListenAndServe(":18082", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Get("")
 		fmt.Fprintln(w, "Hello, client")
 	}))
 
