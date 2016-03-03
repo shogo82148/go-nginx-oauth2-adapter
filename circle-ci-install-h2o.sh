@@ -3,7 +3,7 @@
 set -x
 set -e
 
-if [[ ! -d "$HOME/.local/debs" ]]; then
+if [[ ! -d "$HOME/h2o-1.7.0" ]]; then
     cd ~/
     curl -OL https://github.com/h2o/h2o/archive/v1.7.0.tar.gz
     tar xzf v1.7.0.tar.gz
