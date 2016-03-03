@@ -2,4 +2,4 @@ dependencies:
   pre:
     - sudo apt-get update && sudo apt-get install nginx
     - sudo apt-get install cmake
-    - curl -L https://github.com/h2o/h2o/archive/v1.7.0.tar.gz && tar xzf v1.7.0.tar.gz && cd h2o-1.7.0 && cmake -DWITH_BUNDLED_SSL=on . && make && sudo make install && cd ..
+    - curl -OL https://github.com/h2o/h2o/archive/v1.7.0.tar.gz && tar xzf v1.7.0.tar.gz && cd h2o-1.7.0 && cmake -DWITH_BUNDLED_SSL=on . && make && sudo make install && cd ..
