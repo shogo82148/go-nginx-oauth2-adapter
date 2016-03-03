@@ -34,5 +34,5 @@ lambda do |env|
     return [403, {'content-type' => 'text/plain'}, ["Forbidden\n"]]
   end
 
-  return [399, headers, []]
+  return [399, {}, []]
 end
