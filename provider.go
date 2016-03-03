@@ -73,5 +73,5 @@ func (pc providerConfigDevelopment) Config() oauth2.Config {
 }
 
 func (pc providerConfigDevelopment) Info(c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error) {
-	return "", map[string]interface{}{}, nil
+	return "developer", map[string]interface{}{}, nil
 }
