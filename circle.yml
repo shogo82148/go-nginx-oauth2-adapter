@@ -1,0 +1,8 @@
+dependencies:
+  cache_directories:
+    - ~/h2o-1.7.0
+  pre:
+    - sudo apt-get update && sudo apt-get install nginx
+    - sudo apt-get install cmake build-essential ruby
+    - bash ./circle-ci-install-h2o.sh
+
