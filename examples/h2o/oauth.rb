@@ -1,5 +1,5 @@
 lambda do |env|
-  auth_server = "http://127.0.0.1:18080"
+  auth_server = "http://127.0.0.1:18081"
   auth_callback = "/_auth/callback"
 
   if env["PATH_INFO"] == auth_callback
