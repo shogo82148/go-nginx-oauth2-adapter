@@ -88,5 +88,5 @@ func getListener(c *Config) (net.Listener, error) {
 	}
 
 	// Fallback if not running under Server::Starter
-	return net.Listen("tcp", net.JoinHostPort(c.Host, c.Port))
+	return net.Listen("tcp", c.Address)
 }

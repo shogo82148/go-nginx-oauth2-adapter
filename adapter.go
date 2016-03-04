@@ -41,13 +41,12 @@ func NewServer(config Config) (*Server, error) {
 	for name, provider := range providers {
 		var conf map[string]interface{}
 		var ok bool
-		if config.Providers != nil {
-			conf, ok = config.Providers[name]
-			if !ok {
-				conf = map[string]interface{}{}
-			}
-		} else {
-			conf = map[string]interface{}{}
+		if config.Providers == nil {
+			continue
+		}
+		conf, ok = config.Providers[name]
+		if !ok {
+			continue
 		}
 		providerConfig, err := provider.ParseConfig(conf)
 		if err != nil && err != ErrProviderConfigNotFound {

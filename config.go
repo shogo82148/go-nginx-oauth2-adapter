@@ -9,8 +9,7 @@ import (
 )
 
 type Config struct {
-	Host               string                            `yaml:"host", json:"host"`
-	Port               string                            `yaml:"port", json:"port"`
+	Address            string                            `yaml:"address", json:"address"`
 	Secret             string                            `yaml:"secret", json:"scret"`
 	SessionName        string                            `yaml:"session_name", json:"session_name"`
 	Providers          map[string]map[string]interface{} `yaml:"providers", json:"providers"`
@@ -33,8 +32,7 @@ type CookieConfig struct {
 
 func NewConfig() *Config {
 	return &Config{
-		Host:               "",
-		Port:               "18080",
+		Address:            ":18081",
 		Secret:             "ngx_omniauth_secret_dev",
 		SessionName:        "go-nginx-oauth2-session",
 		Providers:          map[string]map[string]interface{}{},
@@ -90,6 +88,10 @@ func (c *Config) LoadEnv() error {
 
 	if v := os.Getenv("NGX_OMNIAUTH_APP_REFRESH_INTERVAL"); v != "" {
 		c.AppRefreshInterval = v
+	}
+
+	if v := os.Getenv("NGX_OMNIAUTH_ADDRESS"); v != "" {
+		c.Address = v
 	}
 
 	return nil
