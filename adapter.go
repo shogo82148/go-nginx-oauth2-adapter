@@ -63,7 +63,9 @@ func NewServer(config Config) (*Server, error) {
 		return nil, ErrProviderConfigNotFound
 	}
 
-	s.SessionStore = sessions.NewCookieStore([]byte(config.Secret))
+	store := sessions.NewCookieStore([]byte(config.Secret))
+	store.Options = config.Cookie.Options()
+	s.SessionStore = store
 
 	if s.Config.AppRefreshInterval == "" {
 		s.AppRefreshInterval = 24 * time.Hour

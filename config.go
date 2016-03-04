@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gorilla/sessions"
 	"gopkg.in/yaml.v2"
 )
 
@@ -16,7 +17,7 @@ type Config struct {
 	AppRefreshInterval string                            `yaml:"app_refresh_interval", json:"app_refresh_interval"`
 
 	// Fields are a subset of http.Cookie fields.
-	Cookie CookieConfig `yaml:"cookie", json:"cookie"`
+	Cookie *CookieConfig `yaml:"cookie", json:"cookie"`
 }
 
 type CookieConfig struct {
@@ -37,7 +38,7 @@ func NewConfig() *Config {
 		SessionName:        "go-nginx-oauth2-session",
 		Providers:          map[string]map[string]interface{}{},
 		AppRefreshInterval: "24h",
-		Cookie: CookieConfig{
+		Cookie: &CookieConfig{
 			Path:   "/",
 			MaxAge: 60 * 60 * 24 * 3,
 		},
@@ -95,4 +96,14 @@ func (c *Config) LoadEnv() error {
 	}
 
 	return nil
+}
+
+func (c *CookieConfig) Options() *sessions.Options {
+	return &sessions.Options{
+		Path:     c.Path,
+		Domain:   c.Domain,
+		MaxAge:   c.MaxAge,
+		Secure:   c.Secure,
+		HttpOnly: c.HttpOnly,
+	}
 }
