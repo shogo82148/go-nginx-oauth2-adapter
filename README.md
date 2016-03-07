@@ -15,6 +15,39 @@ $ go get github.com/shogo82148/go-nginx-oauth2-adapter/cli/go-nginx-oauth2-adapt
 $ go-nginx-oauth2-adapter
 ```
 
+## CONFIGURATION
+
+The example of configuration file.
+
+``` yaml
+address: ":18081" # listen address
+
+# secret tokens to authenticate/encrypt cookie.
+# see http://www.gorillatoolkit.org/pkg/sessions for more detail
+secrets:
+  - new-authentication-key
+  - new-encryption-key
+  - old-authentication-key
+  - old-encryption-key
+session_name: go-nginx-oauth2-session
+app_refresh_interval: 24h
+
+# cookie settings for saving session
+cookie:
+  path: /
+  domain:
+  max_age: 0
+  secure: false
+  http_only: false
+
+providers:
+  # development: {} # For test.
+  google_oauth2:
+    client_id: YOUR_CLIENT_ID
+    client_secret: YOUR_CLIENT_SECRET
+    scopes: "email,profile" # default: "email,profile"
+```
+
 ## SEE ALSO
 
 - [sorah/nginx_omniauth_adapter](https://github.com/sorah/nginx_omniauth_adapter)
