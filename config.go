@@ -11,7 +11,7 @@ import (
 
 type Config struct {
 	Address            string                            `yaml:"address", json:"address"`
-	Secret             string                            `yaml:"secret", json:"scret"`
+	Secrets            []*string                         `yaml:"secrets", json:"secrets"`
 	SessionName        string                            `yaml:"session_name", json:"session_name"`
 	Providers          map[string]map[string]interface{} `yaml:"providers", json:"providers"`
 	AppRefreshInterval string                            `yaml:"app_refresh_interval", json:"app_refresh_interval"`
@@ -34,7 +34,7 @@ type CookieConfig struct {
 func NewConfig() *Config {
 	return &Config{
 		Address:            ":18081",
-		Secret:             "ngx_omniauth_secret_dev",
+		Secrets:            nil,
 		SessionName:        "go-nginx-oauth2-session",
 		Providers:          map[string]map[string]interface{}{},
 		AppRefreshInterval: "24h",
@@ -80,7 +80,7 @@ func (c *Config) LoadEnv() error {
 	}
 
 	if v := os.Getenv("NGX_OMNIAUTH_SESSION_SECRET"); v != "" {
-		c.Secret = v
+		c.Secrets = []*string{&v}
 	}
 
 	if v := os.Getenv("NGX_OMNIAUTH_SESSION_COOKIE_NAME"); v != "" {

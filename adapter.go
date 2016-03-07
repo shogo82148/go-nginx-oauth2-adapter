@@ -63,7 +63,18 @@ func NewServer(config Config) (*Server, error) {
 		return nil, ErrProviderConfigNotFound
 	}
 
-	store := sessions.NewCookieStore([]byte(config.Secret))
+	secrets := make([][]byte, len(s.Config.Secrets))
+	for i, secret := range s.Config.Secrets {
+		if secret != nil {
+			secrets[i] = []byte(*secret)
+		} else {
+			secrets[i] = nil
+		}
+	}
+	if len(secrets) == 0 {
+		logrus.Warn("session secrets is empty. you should set secure random string.")
+	}
+	store := sessions.NewCookieStore(secrets...)
 	store.Options = config.Cookie.Options()
 	s.SessionStore = store
 
