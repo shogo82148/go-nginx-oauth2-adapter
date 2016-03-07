@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/shogo82148/go-nginx-oauth2-adapter.svg?style=svg)](https://circleci.com/gh/shogo82148/go-nginx-oauth2-adapter)
+
 # go-nginx-oauth2-adapter
 
 a golang port for [sorah/nginx_omniauth_adapter](https://github.com/sorah/nginx_omniauth_adapter)
