@@ -73,6 +73,7 @@ func NewServer(config Config) (*Server, error) {
 	}
 	if len(secrets) == 0 {
 		logrus.Warn("session secrets is empty. you should set secure random string.")
+		secrets = [][]byte{[]byte("secret-for-development")}
 	}
 	store := sessions.NewCookieStore(secrets...)
 	store.Options = config.Cookie.Options()
