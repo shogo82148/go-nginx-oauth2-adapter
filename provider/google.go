@@ -15,7 +15,7 @@ type providerGoogle struct{}
 type providerConfigGoogle struct {
 	baseConfig     oauth2.Config
 	enabledProfile bool
-	domains        []string
+	restrictions   []string
 }
 type profileGoole struct {
 	Gender        string `json:"gender"`
@@ -66,14 +66,14 @@ func (_ providerGoogle) ParseConfig(configFile map[string]interface{}) (adapter.
 		return nil, adapter.ErrProviderConfigNotFound
 	}
 
-	if idomains, ok := configFile["domain"].([]interface{}); ok {
-		domains := make([]string, 0, len(idomains))
-		for _, d := range idomains {
-			if domain, ok := d.(string); ok {
-				domains = append(domains, domain)
+	if irestrictions, ok := configFile["restrictions"].([]interface{}); ok {
+		restrictions := make([]string, 0, len(irestrictions))
+		for _, r := range restrictions {
+			if restriction, ok := r.(string); ok {
+				restrictions = append(restrictions, restriction)
 			}
 		}
-		c.domains = domains
+		c.restrictions = restrictions
 	}
 
 	return c, nil
@@ -108,18 +108,16 @@ func (pc providerConfigGoogle) Info(c *oauth2.Config, t *oauth2.Token) (string, 
 	}
 	info["email"] = idType.Email
 
-	fmt.Println(pc.domains)
-	if len(pc.domains) > 0 {
+	if len(pc.restrictions) > 0 {
 		valid := false
-		for _, d := range pc.domains {
-			fmt.Println(d)
-			if strings.Contains(d, "@") {
-				if d == idType.Email {
+		for _, r := range pc.restrictions {
+			if strings.Contains(r, "@") {
+				if r == idType.Email {
 					valid = true
 					break
 				}
 			} else {
-				if strings.HasSuffix(idType.Email, "@"+d) {
+				if strings.HasSuffix(idType.Email, "@"+r) {
 					valid = true
 					break
 				}
