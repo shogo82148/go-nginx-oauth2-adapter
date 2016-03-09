@@ -68,7 +68,7 @@ func (_ providerGoogle) ParseConfig(configFile map[string]interface{}) (adapter.
 
 	if irestrictions, ok := configFile["restrictions"].([]interface{}); ok {
 		restrictions := make([]string, 0, len(irestrictions))
-		for _, r := range restrictions {
+		for _, r := range irestrictions {
 			if restriction, ok := r.(string); ok {
 				restrictions = append(restrictions, restriction)
 			}
