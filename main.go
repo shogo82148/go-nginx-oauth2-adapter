@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"flag"
+	"fmt"
 	"math/rand"
 	"net"
 	"os"
@@ -14,10 +15,25 @@ import (
 	"github.com/shogo82148/go-gracedown"
 )
 
+const Version = "0.1.0"
+
 func Main() {
 	rand.Seed(time.Now().UnixNano())
 
-	c, err := parseConfig()
+	var configFile string
+	var showVersion bool
+	flag.StringVar(&configFile, "c", "", "configuration file")
+	flag.StringVar(&configFile, "config", "", "configuration file")
+	flag.BoolVar(&showVersion, "v", false, "show version information")
+	flag.BoolVar(&showVersion, "version", false, "show version information")
+	flag.Parse()
+
+	if showVersion {
+		fmt.Println("go-nginx-oauth2-adapter", Version)
+		return
+	}
+
+	c, err := parseConfig(configFile)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
@@ -45,12 +61,7 @@ func Main() {
 	gracedown.Serve(l, LoggingHandler(s))
 }
 
-func parseConfig() (*Config, error) {
-	var configFile string
-	flag.StringVar(&configFile, "c", "", "configuration file")
-	flag.StringVar(&configFile, "config", "", "configuration file")
-	flag.Parse()
-
+func parseConfig(configFile string) (*Config, error) {
 	c := NewConfig()
 	if err := c.LoadEnv(); err != nil {
 		return nil, err
