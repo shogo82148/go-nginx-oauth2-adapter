@@ -51,6 +51,10 @@ providers:
       - specific.user@example.com
 ```
 
+## LICENSE
+
+This software is released under the MIT License, see LICENSE.md.
+
 ## SEE ALSO
 
 - [sorah/nginx_omniauth_adapter](https://github.com/sorah/nginx_omniauth_adapter)
