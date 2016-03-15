@@ -9,8 +9,7 @@ deployment:
   release:
     tag: /v[0-9.]+/
     commands:
-      - git fetch --unshallow || true
-      - git fetch --tags
+      - echo ghr -t $GITHUB_TOKEN -u $USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
       - go get github.com/mitchellh/gox
       - go get github.com/tcnksm/ghr
       - gox --output "dist/{{.Dir}}_{{.OS}}_{{.Arch}}" github.com/shogo82148/go-nginx-oauth2-adapter/cli/go-nginx-oauth2-adapter
