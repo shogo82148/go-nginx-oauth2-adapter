@@ -89,6 +89,6 @@ func TestH2O(t *testing.T) {
 	b, _ := ioutil.ReadAll(resp.Body)
 	fmt.Fprintln(os.Stderr, string(b))
 	if string(b) != "Hello, client\n" {
-		t.Error("want Hello, client, got %s", string(b))
+		t.Errorf("want Hello, client, got %s", string(b))
 	}
 }

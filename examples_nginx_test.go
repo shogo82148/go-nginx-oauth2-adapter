@@ -76,6 +76,6 @@ func TestNginx(t *testing.T) {
 
 	b, _ := ioutil.ReadAll(resp.Body)
 	if string(b) != "Hello, client\n" {
-		t.Error("want Hello, client, got %s", string(b))
+		t.Errorf("want Hello, client, got %s", string(b))
 	}
 }
