@@ -10,25 +10,25 @@ import (
 )
 
 type Config struct {
-	Address            string                            `yaml:"address", json:"address"`
-	Secrets            []*string                         `yaml:"secrets", json:"secrets"`
-	SessionName        string                            `yaml:"session_name", json:"session_name"`
-	Providers          map[string]map[string]interface{} `yaml:"providers", json:"providers"`
-	AppRefreshInterval string                            `yaml:"app_refresh_interval", json:"app_refresh_interval"`
+	Address            string                            `yaml:"address" json:"address"`
+	Secrets            []*string                         `yaml:"secrets" json:"secrets"`
+	SessionName        string                            `yaml:"session_name" json:"session_name"`
+	Providers          map[string]map[string]interface{} `yaml:"providers" json:"providers"`
+	AppRefreshInterval string                            `yaml:"app_refresh_interval" json:"app_refresh_interval"`
 
 	// Fields are a subset of http.Cookie fields.
-	Cookie *CookieConfig `yaml:"cookie", json:"cookie"`
+	Cookie *CookieConfig `yaml:"cookie" json:"cookie"`
 }
 
 type CookieConfig struct {
-	Path   string `yaml:"path", json:"path"`
-	Domain string `yaml:"domain", json:"domain"`
+	Path   string `yaml:"path" json:"path"`
+	Domain string `yaml:"domain" json:"domain"`
 	// MaxAge=0 means no 'Max-Age' attribute specified.
 	// MaxAge<0 means delete cookie now, equivalently 'Max-Age: 0'.
 	// MaxAge>0 means Max-Age attribute present and given in seconds.
-	MaxAge   int  `yaml:"max_age", json:"max_age"`
-	Secure   bool `yaml:"secure", json:"secure"`
-	HttpOnly bool `yaml:"http_only", json:"http_only"`
+	MaxAge   int  `yaml:"max_age" json:"max_age"`
+	Secure   bool `yaml:"secure" json:"secure"`
+	HttpOnly bool `yaml:"http_only" json:"http_only"`
 }
 
 func NewConfig() *Config {
