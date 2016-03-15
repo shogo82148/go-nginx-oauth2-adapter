@@ -7,7 +7,7 @@ dependencies:
     - bash ./circle-ci-install-h2o.sh
 deployment:
   release:
-    tag: v[0-9.]+
+    tag: /v[0-9.]+/
     commands:
       — go get github.com/mitchellh/go
       — go get github.com/tcnksm/gh
