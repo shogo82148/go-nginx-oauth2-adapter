@@ -5,4 +5,11 @@ dependencies:
     - sudo apt-get update && sudo apt-get install nginx
     - sudo apt-get install cmake build-essential ruby
     - bash ./circle-ci-install-h2o.sh
-
+deployment:
+  release:
+    tag: v[0-9.]+
+    commands:
+      — go get github.com/mitchellh/go
+      — go get github.com/tcnksm/gh
+      — gox-output "distgo-nginx-oauth2-adapterd_{{.OS}}_{{.Arch}}"
+      — ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dis/t
