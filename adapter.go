@@ -178,6 +178,30 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Add("x-ngx-omniauth-info", info)
 
+	var b []byte
+	b, err = base64.StdEncoding.DecodeString(info)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": "info is not base64 encoded",
+		}).Info("session is broken. trigger reauthorization for fix it.")
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+
+	var j map[string]interface{}
+	if err := json.Unmarshal(b, &j); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": "info is invalid json",
+		}).Info("session is broken. trigger reauthorization for fix it.")
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	if email, ok := j["email"]; ok {
+		if email, ok := email.(string); ok {
+			w.Header().Add("x-ngx-omniauth-email", email)
+		}
+	}
+
 	fmt.Fprint(w, "")
 }
 
