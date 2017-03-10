@@ -35,8 +35,8 @@ lambda do |env|
   end
 
   return [399, {
-    "x-ngx-omniauth-provider" => testheaders["x-ngx-omniauth-provider"],
-    "x-ngx-omniauth-user"     => testheaders["x-ngx-omniauth-user"],
-    "x-ngx-omniauth-info"     => testheaders["x-ngx-omniauth-info"],
+    "x-fallthru-set-x-ngx-omniauth-provider" => testheaders["x-ngx-omniauth-provider"],
+    "x-fallthru-set-x-ngx-omniauth-user"     => testheaders["x-ngx-omniauth-user"],
+    "x-fallthru-set-x-ngx-omniauth-info"     => testheaders["x-ngx-omniauth-info"],
   }, []]
 end
