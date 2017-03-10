@@ -21,9 +21,12 @@ func Main() {
 	rand.Seed(time.Now().UnixNano())
 
 	var configFile string
+	var configtest bool
 	var showVersion bool
 	flag.StringVar(&configFile, "c", "", "configuration file")
 	flag.StringVar(&configFile, "config", "", "configuration file")
+	flag.BoolVar(&configtest, "t", false, "test configuration and exit")
+	flag.BoolVar(&configtest, "configtest", false, "test configuration and exit")
 	flag.BoolVar(&showVersion, "v", false, "show version information")
 	flag.BoolVar(&showVersion, "version", false, "show version information")
 	flag.Parse()
@@ -39,6 +42,10 @@ func Main() {
 			"err": err.Error(),
 		}).Fatal("error while parsing configure")
 		os.Exit(1)
+	} else {
+		if configtest {
+			os.Exit(0)
+		}
 	}
 
 	startWatchSignal()
