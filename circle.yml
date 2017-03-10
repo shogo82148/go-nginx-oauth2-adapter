@@ -5,10 +5,10 @@ dependencies:
     - sudo apt-get update && sudo apt-get install nginx
     - sudo apt-get install cmake build-essential ruby
     - bash ./circle-ci-install-h2o.sh
-    - curl https://glide.sh/get | sh
   override:
     - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+    - curl https://glide.sh/get | GOPATH=${HOME}/.go_workspace sh
     - glide install
     - go build -v
 test:
