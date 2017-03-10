@@ -19,19 +19,29 @@ import (
 const Version = "0.1.0"
 
 // Main starts the go-nginx-oauth2-adapter server.
-func Main() {
+func Main(args []string) {
 	rand.Seed(time.Now().UnixNano())
 
+	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	var configFile string
 	var configtest bool
 	var showVersion bool
-	flag.StringVar(&configFile, "c", "", "configuration file")
-	flag.StringVar(&configFile, "config", "", "configuration file")
-	flag.BoolVar(&configtest, "t", false, "test configuration and exit")
-	flag.BoolVar(&configtest, "configtest", false, "test configuration and exit")
-	flag.BoolVar(&showVersion, "v", false, "show version information")
-	flag.BoolVar(&showVersion, "version", false, "show version information")
-	flag.Parse()
+	flagSet.StringVar(&configFile, "c", "", "configuration file")
+	flagSet.StringVar(&configFile, "config", "", "configuration file")
+	flagSet.BoolVar(&configtest, "t", false, "test configuration and exit")
+	flagSet.BoolVar(&configtest, "configtest", false, "test configuration and exit")
+	flagSet.BoolVar(&showVersion, "v", false, "show version information")
+	flagSet.BoolVar(&showVersion, "version", false, "show version information")
+	err := flagSet.Parse(args[1:])
+	if err == flag.ErrHelp {
+		return
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Fatal("error while parsing flags")
+		os.Exit(1)
+	}
 
 	if showVersion {
 		fmt.Println("go-nginx-oauth2-adapter", Version)
