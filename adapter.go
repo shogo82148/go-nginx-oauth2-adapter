@@ -196,7 +196,11 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	w.Header().Add("x-ngx-omniauth-email", j["email"].(string))
+	if email, ok := j["email"]; ok {
+		if email, ok := email.(string); ok {
+			w.Header().Add("x-ngx-omniauth-email", email)
+		}
+	}
 
 	fmt.Fprint(w, "")
 }
