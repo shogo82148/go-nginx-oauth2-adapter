@@ -1,5 +1,5 @@
-hash: 3bf0eb1939c3550884e76dec0ef355128f469b147d884174eda6719b7dd0d4cc
-updated: 2017-03-10T20:00:18.610574615+09:00
+hash: b01432506a929fe05ce660fc2620d54ad06e7921f7872252975e2bad84504604
+updated: 2017-03-10T22:33:42.547974203+09:00
 imports:
 - name: cloud.google.com/go
   version: cc13a9bec59f97f8ea60047fedd3005668851a70
@@ -13,7 +13,7 @@ imports:
 - name: github.com/googleapis/gax-go
   version: 8c5154c0fe5bf18cf649634d4c6df50897a32751
 - name: github.com/gorilla/context
-  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+  version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/securecookie
   version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
 - name: github.com/gorilla/sessions
@@ -22,8 +22,6 @@ imports:
   version: f9cb0b066498d26a90fd918fe265adbb0ea02bcf
   subpackages:
   - listener
-- name: github.com/shogo82148/go-gracedown
-  version: c030b2477760b7d0826b55c430dd9fcf37f4ecaf
 - name: github.com/Sirupsen/logrus
   version: 0208149b40d863d2c1a2f8fe5753096a9cf2cc8b
 - name: golang.org/x/net
