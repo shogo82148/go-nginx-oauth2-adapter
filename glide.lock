@@ -1,6 +1,21 @@
-hash: 18d4179ab7b16af708ea5cdf196dbbb7c60cbb5fc0bafac622492e9cad16c291
-updated: 2017-03-10T22:07:47.413379095+09:00
+hash: b01432506a929fe05ce660fc2620d54ad06e7921f7872252975e2bad84504604
+updated: 2017-03-10T22:33:42.547974203+09:00
 imports:
+- name: cloud.google.com/go
+  version: cc13a9bec59f97f8ea60047fedd3005668851a70
+  subpackages:
+  - compute/metadata
+  - internal
+- name: github.com/golang/protobuf
+  version: c9c7427a2a70d2eb3bafa0ab2dc163e45f143317
+  subpackages:
+  - proto
+- name: github.com/googleapis/gax-go
+  version: 8c5154c0fe5bf18cf649634d4c6df50897a32751
+- name: github.com/gorilla/context
+  version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
+- name: github.com/gorilla/securecookie
+  version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
 - name: github.com/gorilla/sessions
   version: ca9ada44574153444b00d3fd9c8559e4cc95f896
 - name: github.com/lestrrat/go-server-starter
@@ -9,10 +24,54 @@ imports:
   - listener
 - name: github.com/Sirupsen/logrus
   version: 0208149b40d863d2c1a2f8fe5753096a9cf2cc8b
+- name: golang.org/x/net
+  version: a6577fac2d73be281a500b310739095313165611
+  subpackages:
+  - context
+  - context/ctxhttp
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - lex/httplex
+  - trace
 - name: golang.org/x/oauth2
   version: efb10a30610e617dbb17fc243f4cc61a8cfa2903
   subpackages:
   - google
+  - internal
+  - jws
+  - jwt
+- name: golang.org/x/sys
+  version: 99f16d856c9836c42d24e7ab64ea72916925fa97
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: b79c28f0197795b4050bfcd7c4c2209136c594b1
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
+- name: google.golang.org/grpc
+  version: 4eaacfed9779ee7568c9e72e9f763dbd3af8e0b4
+  subpackages:
+  - codes
+  - credentials
+  - grpclog
+  - internal
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - stats
+  - tap
+  - transport
 - name: gopkg.in/yaml.v2
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
 testImports: []
