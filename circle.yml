@@ -1,5 +1,6 @@
 machine:
   environment:
+    GODIST: "go1.8.linux-amd64.tar.gz"
     GOROOT: ""
     PATH: "/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:${PATH}"
     GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project"
@@ -7,10 +8,15 @@ machine:
 dependencies:
   cache_directories:
     - ~/h2o-2.1.0
+    - ~/download
   pre:
     - sudo apt-get update && sudo apt-get install nginx
     - sudo apt-get install cmake build-essential ruby
     - bash ./circle-ci-install-h2o.sh
+    - mkdir -p ~/download
+    - test -e ~/download/$GODIST || curl -o ~/download/$GODIST https://storage.googleapis.com/golang/$GODIST
+    - sudo rm -rf /usr/local/go
+    - sudo tar -C /usr/local -xzf ~/download/$GODIST
   override:
     - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
