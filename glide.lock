@@ -1,5 +1,5 @@
-hash: 471777937a9f4803ba2791ee07eb7a681d1e07303a8c7a27bb44efc3a54ea8d6
-updated: 2017-03-10T19:28:58.143161672+09:00
+hash: 3bf0eb1939c3550884e76dec0ef355128f469b147d884174eda6719b7dd0d4cc
+updated: 2017-03-10T20:00:18.610574615+09:00
 imports:
 - name: cloud.google.com/go
   version: cc13a9bec59f97f8ea60047fedd3005668851a70
@@ -19,7 +19,7 @@ imports:
 - name: github.com/gorilla/sessions
   version: ca9ada44574153444b00d3fd9c8559e4cc95f896
 - name: github.com/lestrrat/go-server-starter
-  version: 88699d57aeee0276b4198e135883ff24b88a742f
+  version: f9cb0b066498d26a90fd918fe265adbb0ea02bcf
   subpackages:
   - listener
 - name: github.com/shogo82148/go-gracedown
