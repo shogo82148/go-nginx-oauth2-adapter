@@ -8,7 +8,6 @@ import:
   version: f9cb0b066498d26a90fd918fe265adbb0ea02bcf
   subpackages:
   - listener
-- package: github.com/shogo82148/go-gracedown
 - package: golang.org/x/oauth2
   subpackages:
   - google
