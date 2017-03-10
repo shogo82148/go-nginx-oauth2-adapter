@@ -13,7 +13,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
-
 	"golang.org/x/oauth2"
 )
 
@@ -22,6 +21,9 @@ var ErrProviderConfigNotFound = errors.New("shogo82148/go-nginx-oauth2-adapter: 
 
 // ErrForbidden is the error which the access is forbidden.
 var ErrForbidden = errors.New("shogo82148/go-nginx-oauth2-adapter/provider: access forbidden")
+
+// fallback for "crypto/rand"
+var myRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 // Server is the go-nginx-oauth2-adapter server.
 type Server struct {
@@ -321,7 +323,7 @@ func generateNewState() string {
 	if n, err := crand.Read(data); err != nil || n != len(data) {
 		// fallback insecure pseudo random
 		for i := range data {
-			data[i] = byte(rand.Intn(256))
+			data[i] = byte(myRand.Intn(256))
 		}
 	}
 	return base64.URLEncoding.EncodeToString(data)

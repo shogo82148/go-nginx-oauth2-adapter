@@ -3,12 +3,10 @@ package adapter
 import (
 	"flag"
 	"fmt"
-	"math/rand"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/lestrrat/go-server-starter/listener"
@@ -20,7 +18,6 @@ const Version = "0.1.0"
 
 // Main starts the go-nginx-oauth2-adapter server.
 func Main(args []string) int {
-	rand.Seed(time.Now().UnixNano())
 
 	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	var configFile string
