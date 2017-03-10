@@ -4,6 +4,7 @@ machine:
     GOROOT: ""
     PATH: "/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:${PATH}"
     GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project"
+    PROJECT_PATH: "${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
 
 dependencies:
   cache_directories:
@@ -19,13 +20,15 @@ dependencies:
     - sudo tar -C /usr/local -xzf ~/download/$GODIST
   override:
     - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
-    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${PROJECT_PATH}
     - mkdir -p ${HOME}/.go_workspace/bin
     - curl https://glide.sh/get | GOPATH=${HOME}/.go_workspace sh
+    - cd ${PROJECT_PATH}
     - glide install
     - go build -v
 test:
   override:
+    - cd cd ${PROJECT_PATH}
     - go test -v -race $(glide novendor)
 
 deployment:
