@@ -17,9 +17,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// ErrProviderConfigNotFound is the error which provider configure is not found.
 var ErrProviderConfigNotFound = errors.New("shogo82148/go-nginx-oauth2-adapter: provider configure not found")
+
+// ErrForbidden is the error which the access is forbidden.
 var ErrForbidden = errors.New("shogo82148/go-nginx-oauth2-adapter/provider: access forbidden")
 
+// Server is the go-nginx-oauth2-adapter server.
 type Server struct {
 	Config             Config
 	DefaultPrivider    string
@@ -32,6 +36,7 @@ func init() {
 	gob.Register(time.Time{})
 }
 
+// NewServer returns a new go-nginx-oauth2-adapter server.
 func NewServer(config Config) (*Server, error) {
 	s := &Server{
 		Config:          config,
@@ -121,9 +126,9 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 	// check when the user has started the session.
 	var val interface{}
 	var ok bool
-	var logged_in_at time.Time
+	var loggedInAt time.Time
 	val = session.Values["logged_in_at"]
-	if logged_in_at, ok = val.(time.Time); !ok {
+	if loggedInAt, ok = val.(time.Time); !ok {
 		logrus.WithFields(logrus.Fields{
 			"err": "logged_in_at is not found",
 		}).Info("session is broken. trigger reauthorization for fix it.")
@@ -131,7 +136,7 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if time.Now().Sub(logged_in_at) > s.AppRefreshInterval {
+	if time.Now().Sub(loggedInAt) > s.AppRefreshInterval {
 		logrus.Info("session is expired. trigger reauthorization for fix it.")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return

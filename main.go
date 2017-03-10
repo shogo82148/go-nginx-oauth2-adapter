@@ -15,8 +15,10 @@ import (
 	"github.com/shogo82148/go-gracedown"
 )
 
+// Version is the version of go-nginx-oauth2-adapter.
 const Version = "0.1.0"
 
+// Main starts the go-nginx-oauth2-adapter server.
 func Main() {
 	rand.Seed(time.Now().UnixNano())
 
@@ -83,11 +85,11 @@ func parseConfig(configFile string) (*Config, error) {
 }
 
 func startWatchSignal() {
-	signal_chan := make(chan os.Signal)
-	signal.Notify(signal_chan, syscall.SIGTERM)
+	signalChan := make(chan os.Signal)
+	signal.Notify(signalChan, syscall.SIGTERM)
 	go func() {
 		for {
-			s := <-signal_chan
+			s := <-signalChan
 			if s == syscall.SIGTERM {
 				logrus.Info("received SIGTERM")
 				gracedown.Close()
