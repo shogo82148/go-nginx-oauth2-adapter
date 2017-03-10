@@ -95,6 +95,7 @@ func (h loggingHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	logrus.WithFields(fields).Info("access log")
 }
 
+// LoggingHandler logs HTTP requests.
 func LoggingHandler(h http.Handler) http.Handler {
 	return loggingHandler{h}
 }

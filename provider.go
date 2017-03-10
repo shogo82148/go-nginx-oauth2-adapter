@@ -9,17 +9,20 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Provider is an OAuth provider.
 type Provider interface {
 	ParseConfig(configFile map[string]interface{}) (ProviderConfig, error)
 }
 
+// ProviderConfig is a config for an OAuth provider.
 type ProviderConfig interface {
 	Config() oauth2.Config
 	Info(c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error)
 }
 
-var providers map[string]Provider = map[string]Provider{}
+var providers = map[string]Provider{}
 
+// RegisterProvider registers the OAuth provider.
 func RegisterProvider(name string, provider Provider) {
 	providers[name] = provider
 }
@@ -33,7 +36,8 @@ type providerConfigDevelopment struct {
 	listener net.Listener
 }
 
-func (_ providerDevelopment) ParseConfig(configFile map[string]interface{}) (ProviderConfig, error) {
+// ParseConfig parses the config for the development provider.
+func (providerDevelopment) ParseConfig(configFile map[string]interface{}) (ProviderConfig, error) {
 	l, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, err
