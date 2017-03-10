@@ -19,7 +19,7 @@ import (
 const Version = "0.1.0"
 
 // Main starts the go-nginx-oauth2-adapter server.
-func Main(args []string) {
+func Main(args []string) int {
 	rand.Seed(time.Now().UnixNano())
 
 	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
@@ -34,7 +34,7 @@ func Main(args []string) {
 	flagSet.BoolVar(&showVersion, "version", false, "show version information")
 	err := flagSet.Parse(args[1:])
 	if err == flag.ErrHelp {
-		return
+		return 2
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -45,15 +45,15 @@ func Main(args []string) {
 
 	if showVersion {
 		fmt.Println("go-nginx-oauth2-adapter", Version)
-		return
+		return 0
 	}
 
 	c, err := parseConfig(configFile)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
-		}).Fatal("error while parsing configure")
-		os.Exit(1)
+		}).Error("error while parsing configure")
+		return 1
 	}
 
 	startWatchSignal()
@@ -61,23 +61,23 @@ func Main(args []string) {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
-		}).Fatal("listen error")
-		os.Exit(1)
+		}).Error("listen error")
+		return 1
 	}
 
 	s, err := NewServer(*c)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
-		}).Fatal("init server error")
-		os.Exit(1)
-	} else {
-		if configtest {
-			os.Exit(0)
-		}
+		}).Error("init server error")
+		return 1
+	}
+	if configtest {
+		return 0
 	}
 
 	gracedown.Serve(l, LoggingHandler(s))
+	return 0
 }
 
 func parseConfig(configFile string) (*Config, error) {

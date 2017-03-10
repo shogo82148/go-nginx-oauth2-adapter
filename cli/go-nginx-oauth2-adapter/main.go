@@ -8,5 +8,5 @@ import (
 )
 
 func main() {
-	adapter.Main(os.Args)
+	os.Exit(adapter.Main(os.Args))
 }
