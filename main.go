@@ -3,12 +3,10 @@ package adapter
 import (
 	"flag"
 	"fmt"
-	"math/rand"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/lestrrat/go-server-starter/listener"
@@ -19,31 +17,45 @@ import (
 const Version = "0.1.0"
 
 // Main starts the go-nginx-oauth2-adapter server.
-func Main() {
-	rand.Seed(time.Now().UnixNano())
+func Main(args []string) int {
 
+	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	var configFile string
 	var configtest bool
 	var showVersion bool
-	flag.StringVar(&configFile, "c", "", "configuration file")
-	flag.StringVar(&configFile, "config", "", "configuration file")
-	flag.BoolVar(&configtest, "t", false, "test configuration and exit")
-	flag.BoolVar(&configtest, "configtest", false, "test configuration and exit")
-	flag.BoolVar(&showVersion, "v", false, "show version information")
-	flag.BoolVar(&showVersion, "version", false, "show version information")
-	flag.Parse()
+	var showHelp bool
+	flagSet.StringVar(&configFile, "c", "", "configuration file")
+	flagSet.StringVar(&configFile, "config", "", "configuration file")
+	flagSet.BoolVar(&configtest, "t", false, "test configuration and exit")
+	flagSet.BoolVar(&configtest, "configtest", false, "test configuration and exit")
+	flagSet.BoolVar(&showVersion, "v", false, "show version information")
+	flagSet.BoolVar(&showVersion, "version", false, "show version information")
+	flagSet.BoolVar(&showHelp, "h", false, "show help")
+	flagSet.BoolVar(&showHelp, "help", false, "show help")
+	err := flagSet.Parse(args[1:])
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Error("error while parsing flags")
+		return 2
+	}
 
 	if showVersion {
 		fmt.Println("go-nginx-oauth2-adapter", Version)
-		return
+		return 0
+	}
+
+	if showHelp {
+		flagSet.Usage()
+		return 0
 	}
 
 	c, err := parseConfig(configFile)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
-		}).Fatal("error while parsing configure")
-		os.Exit(1)
+		}).Error("error while parsing configure")
+		return 1
 	}
 
 	startWatchSignal()
@@ -51,23 +63,23 @@ func Main() {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
-		}).Fatal("listen error")
-		os.Exit(1)
+		}).Error("listen error")
+		return 1
 	}
 
 	s, err := NewServer(*c)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
-		}).Fatal("init server error")
-		os.Exit(1)
-	} else {
-		if configtest {
-			os.Exit(0)
-		}
+		}).Error("init server error")
+		return 1
+	}
+	if configtest {
+		return 0
 	}
 
 	gracedown.Serve(l, LoggingHandler(s))
+	return 0
 }
 
 func parseConfig(configFile string) (*Config, error) {
