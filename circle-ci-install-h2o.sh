@@ -3,13 +3,15 @@
 set -x
 set -e
 
-if [[ ! -d "$HOME/h2o-1.7.0" ]]; then
+H2O_VERSION=1.7.0
+
+if [[ ! -d "$HOME/h2o-$H2O_VERSION" ]]; then
     cd ~/
-    curl -OL https://github.com/h2o/h2o/archive/v1.7.0.tar.gz
-    tar xzf v1.7.0.tar.gz
+    curl -OL "https://github.com/h2o/h2o/archive/v$H2O_VERSION.tar.gz"
+    tar xzf "v$H2O_VERSION.tar.gz"
 fi
 
-cd ~/h2o-1.7.0
+cd "$HOME/h2o-$H2O_VERSION"
 cmake -DWITH_BUNDLED_SSL=on .
 make
 sudo make install
