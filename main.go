@@ -42,10 +42,6 @@ func Main() {
 			"err": err.Error(),
 		}).Fatal("error while parsing configure")
 		os.Exit(1)
-	} else {
-		if configtest {
-			os.Exit(0)
-		}
 	}
 
 	startWatchSignal()
@@ -63,6 +59,10 @@ func Main() {
 			"err": err.Error(),
 		}).Fatal("init server error")
 		os.Exit(1)
+	} else {
+		if configtest {
+			os.Exit(0)
+		}
 	}
 
 	gracedown.Serve(l, LoggingHandler(s))
