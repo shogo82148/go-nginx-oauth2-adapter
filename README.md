@@ -4,7 +4,7 @@
 
 a golang port for [sorah/nginx_omniauth_adapter](https://github.com/sorah/nginx_omniauth_adapter)
 
-## PEEREQUISITE
+## PREREQUISITE
 
 - nginx with ngx_http_auth_request_module, or h2o with mruby
 
