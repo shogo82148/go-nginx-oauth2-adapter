@@ -1,10 +1,12 @@
 package adapter
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"math/rand"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,7 +14,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/lestrrat/go-server-starter/listener"
-	"github.com/shogo82148/go-gracedown"
 )
 
 // Version is the version of go-nginx-oauth2-adapter.
@@ -46,7 +47,6 @@ func Main() {
 		os.Exit(1)
 	}
 
-	startWatchSignal()
 	l, err := getListener(c)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -67,7 +67,30 @@ func Main() {
 		}
 	}
 
-	gracedown.Serve(l, LoggingHandler(s))
+	server := &http.Server{
+		Handler: LoggingHandler(s),
+	}
+	go func() {
+		err := server.Serve(l)
+		if err == http.ErrServerClosed {
+			return
+		}
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err.Error(),
+			}).Fatal("serve error")
+		}
+	}()
+
+	waitSignal()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err = server.Shutdown(ctx)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Error("shutdown server error")
+	}
 }
 
 func parseConfig(configFile string) (*Config, error) {
@@ -84,18 +107,16 @@ func parseConfig(configFile string) (*Config, error) {
 	return c, nil
 }
 
-func startWatchSignal() {
-	signalChan := make(chan os.Signal)
+func waitSignal() {
+	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGTERM)
-	go func() {
-		for {
-			s := <-signalChan
-			if s == syscall.SIGTERM {
-				logrus.Info("received SIGTERM")
-				gracedown.Close()
-			}
+	for {
+		s := <-signalChan
+		if s == syscall.SIGTERM {
+			logrus.Info("received SIGTERM")
+			return
 		}
-	}()
+	}
 }
 
 func getListener(c *Config) (net.Listener, error) {
