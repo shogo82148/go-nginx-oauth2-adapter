@@ -23,13 +23,10 @@ dependencies:
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${PROJECT_PATH}
     - mkdir -p ${HOME}/.go_workspace/bin
     - curl https://glide.sh/get | GOPATH=${HOME}/.go_workspace sh
-    - cd ${PROJECT_PATH}
-    - glide install
-    - go build -v
+    - cd ${PROJECT_PATH} && glide install && go build -v
 test:
   override:
-    - cd ${PROJECT_PATH}
-    - go test -v -race $(glide novendor)
+    - cd ${PROJECT_PATH} && go test -v -race $(glide novendor)
 
 deployment:
   release:
