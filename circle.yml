@@ -28,7 +28,7 @@ dependencies:
     - go build -v
 test:
   override:
-    - cd cd ${PROJECT_PATH}
+    - cd ${PROJECT_PATH}
     - go test -v -race $(glide novendor)
 
 deployment:
