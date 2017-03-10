@@ -23,25 +23,30 @@ func Main(args []string) int {
 	var configFile string
 	var configtest bool
 	var showVersion bool
+	var showHelp bool
 	flagSet.StringVar(&configFile, "c", "", "configuration file")
 	flagSet.StringVar(&configFile, "config", "", "configuration file")
 	flagSet.BoolVar(&configtest, "t", false, "test configuration and exit")
 	flagSet.BoolVar(&configtest, "configtest", false, "test configuration and exit")
 	flagSet.BoolVar(&showVersion, "v", false, "show version information")
 	flagSet.BoolVar(&showVersion, "version", false, "show version information")
+	flagSet.BoolVar(&showHelp, "h", false, "show help")
+	flagSet.BoolVar(&showHelp, "help", false, "show help")
 	err := flagSet.Parse(args[1:])
-	if err == flag.ErrHelp {
-		return 2
-	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
-		}).Fatal("error while parsing flags")
-		os.Exit(1)
+		}).Error("error while parsing flags")
+		return 2
 	}
 
 	if showVersion {
 		fmt.Println("go-nginx-oauth2-adapter", Version)
+		return 0
+	}
+
+	if showHelp {
+		flagSet.Usage()
 		return 0
 	}
 
