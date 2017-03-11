@@ -45,7 +45,7 @@ build-darwin-386:
 ##### release settings
 
 .PHONY: release-windows-amd64 release-windows-386 release-linux-amd64 release-linux-386 release-darwin-amd64 release-darwin-386
-.PHONY: release-targz release-zip release-files
+.PHONY: release-targz release-zip release-files release-upload
 
 $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH):
 	@mkdir -p $@
@@ -77,6 +77,9 @@ release-zip: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 	cd $(ARTIFACTS_DIR) && zip -9 $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).zip go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/*
 
 release-files: release-windows-386 release-windows-amd64 release-linux-386 release-linux-amd64 release-darwin-386 release-darwin-amd64
+
+release-upload: release-files
+	ghr -u $(GITHUB_USERNAME) --draft --replace v$(VERSION) $(RELEASE_DIR)
 
 
 test:
