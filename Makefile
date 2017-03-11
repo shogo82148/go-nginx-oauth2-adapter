@@ -67,10 +67,10 @@ $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH):
 	@mkdir -p $@
 
 release-windows-amd64:
-	@$(MAKE) release-zip GOOS=windows GOARCH=amd64
+	@$(MAKE) release-zip GOOS=windows GOARCH=amd64 SUFFIX=.exe
 
 release-windows-386:
-	@$(MAKE) release-zip GOOS=windows GOARCH=386
+	@$(MAKE) release-zip GOOS=windows GOARCH=386 SUFFIX=.exe
 
 release-linux-amd64:
 	@$(MAKE) release-targz GOOS=linux GOARCH=amd64
@@ -84,11 +84,11 @@ release-darwin-amd64:
 release-darwin-386:
 	@$(MAKE) release-zip GOOS=darwin GOARCH=386
 
-release-targz: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
+release-targz: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)$(SUFFIX)
 	@echo " * Creating tar.gz for $(GOOS)/$(GOARCH)"
 	tar -czf $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).tar.gz -C $(ARTIFACTS_DIR) go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 
-release-zip: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
+release-zip: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)$(SUFFIX)
 	@echo " * Creating zip for $(GOOS)/$(GOARCH)"
 	cd $(ARTIFACTS_DIR) && zip -9 $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).zip go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/*
 
