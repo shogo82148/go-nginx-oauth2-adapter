@@ -6,10 +6,26 @@ ARTIFACTS_DIR=$(CURDIR)/artifacts/$(VERSION)
 RELEASE_DIR=$(CURDIR)/release/$(VERSION)
 SRC_FILES = $(wildcard *.go cli/go-nginx-oauth2-adapter/*.go provider/*.go)
 GITHUB_USERNAME=shogo82148
+ARCHIVER=$(CURDIR)/archiver-$(shell go env GOOS)-$(shell go env GOARCH)/archiver
 
 .PHONY: all test clean
 
 all:
+
+#### dependency management
+
+installdeps: glide-$(GOOS)-$(GOARCH)/glide
+	PATH=glide-$(GOOS)-$(GOARCH):$(PATH) glide install
+
+glide-$(GOOS)-$(GOARCH):
+	@echo " * Creating $(@F)"
+	@mkdir -p $(@F)
+	
+glide-$(GOOS)-$(GOARCH)/glide:
+	@$(MAKE) glide-$(GOOS)-$(GOARCH)
+	@wget -O - https://github.com/Masterminds/glide/releases/download/v0.12.3/glide-v0.12.3-$(GOOS)-$(GOARCH).tar.gz | tar xvz
+	@mv $(GOOS)-$(GOARCH)/glide glide-$(GOOS)-$(GOARCH)
+	@rm -rf $(GOOS)-$(GOARCH)
 
 ##### build settings
 
@@ -72,15 +88,21 @@ release-targz: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 	@echo " * Creating tar.gz for $(GOOS)/$(GOARCH)"
 	tar -czf $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).tar.gz -C $(ARTIFACTS_DIR) go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 
-release-zip: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
+release-zip: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH) $(ARCHIVER)
 	@echo " * Creating zip for $(GOOS)/$(GOARCH)"
-	cd $(ARTIFACTS_DIR) && zip -9 $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).zip go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/*
+	cd $(ARTIFACTS_DIR) && $(ARCHIVER) make \
+	$(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).zip go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/*
 
 release-files: release-windows-386 release-windows-amd64 release-linux-386 release-linux-amd64 release-darwin-386 release-darwin-amd64
 
 release-upload: release-files
 	ghr -u $(GITHUB_USERNAME) --draft --replace v$(VERSION) $(RELEASE_DIR)
 
+	
+$(ARCHIVER):
+	mkdir -p $(shell dirname $(ARCHIVER))
+	wget -O $(ARCHIVER) https://github.com/mholt/archiver/releases/download/v2.0/archiver_$(shell go env GOOS)_$(shell go env GOARCH)
+	chmod 755 $(ARCHIVER)
 
 test:
 	go test -v -race $(shell glide novendor)
