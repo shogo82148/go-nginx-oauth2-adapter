@@ -20,7 +20,7 @@ $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH):
 
 $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/go-nginx-oauth2-adapter$(SUFFIX): $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH) $(SRC_FILES)
 	@echo " * Building binary for $(GOOS)/$(GOARCH)..."
-	@go build -o $@ cli/go-nginx-oauth2-adapter/main.go
+	@CGO_ENABLED=0 go build -o $@ cli/go-nginx-oauth2-adapter/main.go
 
 build: $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/go-nginx-oauth2-adapter$(SUFFIX)
 
