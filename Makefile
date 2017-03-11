@@ -82,7 +82,7 @@ release-darwin-amd64:
 	@$(MAKE) release-zip GOOS=darwin GOARCH=amd64
 
 release-darwin-386:
-	@$(MAKE) build release-zip GOOS=darwin GOARCH=386
+	@$(MAKE) release-zip GOOS=darwin GOARCH=386
 
 release-targz: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 	@echo " * Creating tar.gz for $(GOOS)/$(GOARCH)"
