@@ -26,7 +26,7 @@ dependencies:
     - cd ${PROJECT_PATH} && glide install && go build -v
 test:
   override:
-    - cd ${PROJECT_PATH} && go test -v -race $(glide novendor)
+    - cd ${PROJECT_PATH} && make test
 
 deployment:
   release:
