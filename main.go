@@ -60,14 +60,6 @@ func Main(args []string) int {
 		return 1
 	}
 
-	l, err := getListener(c)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"err": err.Error(),
-		}).Error("listen error")
-		return 1
-	}
-
 	s, err := NewServer(*c)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -79,6 +71,13 @@ func Main(args []string) int {
 		return 0
 	}
 
+	l, err := getListener(c)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Error("listen error")
+		return 1
+	}
 	server := &http.Server{
 		Handler: LoggingHandler(s),
 	}
