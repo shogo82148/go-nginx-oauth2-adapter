@@ -84,11 +84,11 @@ release-darwin-amd64:
 release-darwin-386:
 	@$(MAKE) release-zip GOOS=darwin GOARCH=386
 
-release-targz: build
+release-targz: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 	@echo " * Creating tar.gz for $(GOOS)/$(GOARCH)"
 	tar -czf $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).tar.gz -C $(ARTIFACTS_DIR) go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 
-release-zip: build
+release-zip: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 	@echo " * Creating zip for $(GOOS)/$(GOARCH)"
 	cd $(ARTIFACTS_DIR) && zip -9 $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).zip go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/*
 
