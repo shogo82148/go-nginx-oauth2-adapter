@@ -34,5 +34,9 @@ lambda do |env|
     return [403, {'content-type' => 'text/plain'}, ["Forbidden\n"]]
   end
 
-  return [399, {}, []]
+  return [399, {
+    "x-fallthru-set-x-ngx-omniauth-provider" => testheaders["x-ngx-omniauth-provider"],
+    "x-fallthru-set-x-ngx-omniauth-user"     => testheaders["x-ngx-omniauth-user"],
+    "x-fallthru-set-x-ngx-omniauth-info"     => testheaders["x-ngx-omniauth-info"],
+  }, []]
 end
