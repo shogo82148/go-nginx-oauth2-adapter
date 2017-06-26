@@ -54,9 +54,9 @@ func TestH2O(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	go http.ListenAndServe(":18081", s)
+	go http.ListenAndServe("127.0.0.1:18081", s)
 
-	go http.ListenAndServe(":18082", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	go http.ListenAndServe("127.0.0.1:18082", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// XXX: it seems that h2o does not support to modify requests :(
 		// if got, expected := r.Header.Get("x-ngx-omniauth-provider"), "development"; got != expected {

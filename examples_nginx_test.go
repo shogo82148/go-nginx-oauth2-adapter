@@ -51,9 +51,9 @@ func TestNginx(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	go http.ListenAndServe(":18081", s)
+	go http.ListenAndServe("127.0.0.1:18081", s)
 
-	go http.ListenAndServe(":18082", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	go http.ListenAndServe("127.0.0.1:18082", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if got, expected := r.Header.Get("x-ngx-omniauth-provider"), "development"; got != expected {
 			t.Errorf("want %s, got %s", expected, got)
 		}

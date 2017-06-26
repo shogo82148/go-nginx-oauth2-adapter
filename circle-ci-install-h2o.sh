@@ -3,7 +3,7 @@
 set -x
 set -e
 
-H2O_VERSION=2.1.0
+H2O_VERSION=2.2.2
 
 if [[ ! -d "$HOME/h2o-$H2O_VERSION" ]]; then
     cd ~/
@@ -12,6 +12,6 @@ if [[ ! -d "$HOME/h2o-$H2O_VERSION" ]]; then
 fi
 
 cd "$HOME/h2o-$H2O_VERSION"
-cmake -DWITH_BUNDLED_SSL=on .
+cmake -DWITH_BUNDLED_SSL=on -DWITH_MRUBY=on .
 make
 sudo make install
