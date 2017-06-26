@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/lestrrat/go-server-starter/listener"
+	"github.com/sirupsen/logrus"
 )
 
 // Version is the version of go-nginx-oauth2-adapter.

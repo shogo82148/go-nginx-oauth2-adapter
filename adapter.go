@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
 
