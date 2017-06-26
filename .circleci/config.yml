@@ -12,6 +12,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install nginx cmake build-essential ruby openssl libssl-dev zlib1g-dev bison
             sudo chmod -R 777 /var/log/nginx
+            sudo chmod -R 777 /var/lib/nginx
             bash ./circle-ci-install-h2o.sh
             curl https://glide.sh/get | sh
             glide install
