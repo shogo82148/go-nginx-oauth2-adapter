@@ -14,18 +14,9 @@ all: build-windows-386 build-windows-amd64 build-linux-386 build-linux-amd64 bui
 
 #### dependency management
 
-installdeps: glide-$(GOOS)-$(GOARCH)/glide
-	PATH=glide-$(GOOS)-$(GOARCH):$(PATH) glide install
-
-glide-$(GOOS)-$(GOARCH):
-	@echo " * Creating $(@F)"
-	@mkdir -p $(@F)
-	
-glide-$(GOOS)-$(GOARCH)/glide:
-	@$(MAKE) glide-$(GOOS)-$(GOARCH)
-	@wget -O - https://github.com/Masterminds/glide/releases/download/v0.12.3/glide-v0.12.3-$(GOOS)-$(GOARCH).tar.gz | tar xvz
-	@mv $(GOOS)-$(GOARCH)/glide glide-$(GOOS)-$(GOARCH)
-	@rm -rf $(GOOS)-$(GOARCH)
+installdeps:
+	go get github.com/golang/dep/cmd/dep
+	dep ensure
 
 ##### build settings
 
@@ -103,7 +94,7 @@ $(ARCHIVER):
 	chmod 755 $(ARCHIVER)
 
 test:
-	go test -v -race $(shell glide novendor)
+	go test -v -race ./...
 
 clean:
 	-rm -rf vendor
