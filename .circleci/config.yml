@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/github.com/shogo82148/go-nginx-oauth2-adapter
+    docker:
+      - image: circleci/golang:1.9
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install nginx cmake build-essential ruby openssl libssl-dev zlib1g-dev bison
+            sudo chmod -R 777 /var/log/nginx
+            sudo chmod -R 777 /var/lib/nginx
+            bash ./circle-ci-install-h2o.sh
+            curl https://glide.sh/get | sh
+            glide install
+      - run:
+          name: Test
+          command: go build -v && make test
