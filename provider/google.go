@@ -1,9 +1,9 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/shogo82148/go-nginx-oauth2-adapter"
@@ -40,7 +40,7 @@ func init() {
 	adapter.RegisterProvider("google_oauth2", providerGoogle{})
 }
 
-func (_ providerGoogle) ParseConfig(configFile map[string]interface{}) (adapter.ProviderConfig, error) {
+func (providerGoogle) ParseConfig(configFile map[string]interface{}) (adapter.ProviderConfig, error) {
 	strScopes := getConfigString(configFile, "scopes", "NGX_OMNIAUTH_GOOGLE_SCOPES")
 	if strScopes == "" {
 		strScopes = "email,profile"
@@ -84,6 +84,10 @@ func (pc providerConfigGoogle) Config() oauth2.Config {
 }
 
 func (pc providerConfigGoogle) Info(c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error) {
+	return pc.InfoContext(context.Background(), c, t)
+}
+
+func (pc providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error) {
 	info := map[string]interface{}{}
 
 	// parse id_token
@@ -130,7 +134,7 @@ func (pc providerConfigGoogle) Info(c *oauth2.Config, t *oauth2.Token) (string, 
 
 	// get detail of profile
 	if pc.enabledProfile {
-		client := c.Client(oauth2.NoContext, t)
+		client := c.Client(ctx, t)
 		resp, err := client.Get("https://www.googleapis.com/plus/v1/people/me/openIdConnect")
 		if err != nil {
 			return "", nil, err
@@ -140,8 +144,7 @@ func (pc providerConfigGoogle) Info(c *oauth2.Config, t *oauth2.Token) (string, 
 		var profile profileGoole
 		decoder := json.NewDecoder(resp.Body)
 		if err := decoder.Decode(&profile); err != nil {
-			fmt.Println(err)
-			return "", nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: invaid profile")
+			return "", nil, err
 		}
 		info["name"] = profile.Name
 		info["first_name"] = profile.GivenName

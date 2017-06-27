@@ -13,7 +13,6 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/oauth2"
 )
 
 // ErrProviderConfigNotFound is the error which provider configure is not found.
@@ -277,7 +276,15 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conf := s.ProviderConfigs[provider].Config()
+	providerConfig, ok := s.ProviderConfigs[provider]
+	if !ok {
+		logrus.WithFields(logrus.Fields{
+			"err": "provider is not found",
+		}).Info("session is broken.")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	conf := providerConfig.Config()
 	conf.RedirectURL = callback
 
 	query := r.URL.Query()
@@ -291,7 +298,7 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	code := query.Get("code")
-	t, err := conf.Exchange(oauth2.NoContext, code)
+	t, err := conf.Exchange(r.Context(), code)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
@@ -300,7 +307,13 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uid, info, err := s.ProviderConfigs[provider].Info(&conf, t)
+	var uid string
+	var info map[string]interface{}
+	if infoctx, ok := providerConfig.(ProviderInfoContext); ok {
+		uid, info, err = infoctx.InfoContext(r.Context(), &conf, t)
+	} else {
+		uid, info, err = providerConfig.Info(&conf, t)
+	}
 	if err != nil {
 		if err == ErrForbidden {
 			logrus.WithFields(logrus.Fields{
