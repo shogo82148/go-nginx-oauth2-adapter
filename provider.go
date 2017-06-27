@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -18,6 +19,11 @@ type Provider interface {
 type ProviderConfig interface {
 	Config() oauth2.Config
 	Info(c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error)
+}
+
+// ProviderInfoContext is for support context.Context.
+type ProviderInfoContext interface {
+	InfoContext(ctx context.Context, c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error)
 }
 
 var providers = map[string]Provider{}
