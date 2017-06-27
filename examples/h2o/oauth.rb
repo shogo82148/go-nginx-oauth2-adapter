@@ -2,8 +2,8 @@ class OAuth2Adapter
 
   def initialize(config={})
     config = {
-      :auth_server = "http://127.0.0.1:18081",
-      :auth_callback = "/_auth/callback",
+      :auth_server => "http://127.0.0.1:18081",
+      :auth_callback => "/_auth/callback",
     }.merge(config)
     @auth_server = config[:auth_server]
     @auth_callback = config[:auth_callback]
