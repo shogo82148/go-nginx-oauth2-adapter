@@ -220,7 +220,12 @@ func (s *Server) HandlerInitiate(w http.ResponseWriter, r *http.Request) {
 	session.Values["callback"] = callback
 	session.Values["next"] = next
 	session.Values["state"] = state
-	session.Save(r, w)
+	if err := session.Save(r, w); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Error("failed to save session")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 
 	http.Redirect(w, r, conf.AuthCodeURL(state), http.StatusFound)
 }
@@ -229,6 +234,9 @@ func (s *Server) HandlerInitiate(w http.ResponseWriter, r *http.Request) {
 func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	session, err := s.SessionStore.Get(r, s.Config.SessionName)
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err.Error(),
+		}).Error("failed to get session")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
