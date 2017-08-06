@@ -54,9 +54,9 @@ func TestH2O(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	go http.ListenAndServe("127.0.0.1:18081", s)
+	go http.ListenAndServe(":18081", s)
 
-	go http.ListenAndServe("127.0.0.1:18082", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	go http.ListenAndServe(":18082", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// XXX: it seems that h2o does not support to modify requests :(
 		// if got, expected := r.Header.Get("x-ngx-omniauth-provider"), "development"; got != expected {
@@ -80,7 +80,7 @@ func TestH2O(t *testing.T) {
 		// it takes a long time to shutdown gracefully when keep-alives is enabled.
 		Transport: &http.Transport{DisableKeepAlives: true},
 	}
-	resp, err := client.Get("http://ngx-auth-test.127.0.0.1.xip.io:18080/")
+	resp, err := client.Get("http://ngx-auth-test.loopback.shogo82148.com:18080/")
 	if err != nil {
 		t.Error(err)
 	}
