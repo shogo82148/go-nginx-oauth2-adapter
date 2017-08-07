@@ -45,7 +45,7 @@ providers:
   google_oauth2:
     client_id: YOUR_CLIENT_ID
     client_secret: YOUR_CLIENT_SECRET
-    scopes: "email,profile" # default: "email,profile"
+    scopes: "openid,email,profile" # default: "openid,email,profile"
     restrictions:
       - example.com # domain of your Google App
       - specific.user@example.com

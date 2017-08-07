@@ -4,19 +4,37 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
+	"sync"
+	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/mendsley/gojwk"
 	"github.com/shogo82148/go-nginx-oauth2-adapter"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
+
+const googleOpenIDConfigurationURL = "https://accounts.google.com/.well-known/openid-configuration"
 
 type providerGoogle struct{}
 type providerConfigGoogle struct {
 	baseConfig     oauth2.Config
 	enabledProfile bool
 	restrictions   []string
+
+	mu       sync.RWMutex
+	jwksuri  googleJWKSURI
+	expireAt time.Time
 }
+type googleOpenIDConfiguration struct {
+	JWKSURI string `json:"jwks_uri"`
+}
+type googleJWKSURI struct {
+	Keys []gojwk.Key `json:"keys"`
+}
+
 type profileGoole struct {
 	Gender        string `json:"gender"`
 	Name          string `json:"name"`
@@ -30,10 +48,14 @@ type profileGoole struct {
 	Email         string `json:"email"`
 	EmailVerified string `json:"email_verified"`
 }
-type idTypeGoole struct {
+type idTypeGoogle struct {
 	Sub   string `json:"sub"`
 	Email string `json:"email"`
 	HD    string `json:"hd"`
+}
+
+func (*idTypeGoogle) Valid() error {
+	return nil
 }
 
 func init() {
@@ -43,7 +65,7 @@ func init() {
 func (providerGoogle) ParseConfig(configFile map[string]interface{}) (adapter.ProviderConfig, error) {
 	strScopes := getConfigString(configFile, "scopes", "NGX_OMNIAUTH_GOOGLE_SCOPES")
 	if strScopes == "" {
-		strScopes = "email,profile"
+		strScopes = "openid,email,profile"
 	}
 	scopes := strings.Split(strScopes, ",")
 
@@ -76,18 +98,18 @@ func (providerGoogle) ParseConfig(configFile map[string]interface{}) (adapter.Pr
 		c.restrictions = restrictions
 	}
 
-	return c, nil
+	return &c, nil
 }
 
-func (pc providerConfigGoogle) Config() oauth2.Config {
+func (pc *providerConfigGoogle) Config() oauth2.Config {
 	return pc.baseConfig
 }
 
-func (pc providerConfigGoogle) Info(c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error) {
+func (pc *providerConfigGoogle) Info(c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error) {
 	return pc.InfoContext(context.Background(), c, t)
 }
 
-func (pc providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error) {
+func (pc *providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Config, t *oauth2.Token) (string, map[string]interface{}, error) {
 	info := map[string]interface{}{}
 
 	// parse id_token
@@ -96,20 +118,29 @@ func (pc providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Config
 		return "", nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: id_token is not found")
 	}
 
-	keys := strings.Split(extra, ".")
-	if len(keys) < 2 {
-		return "", nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: invalid id_token")
-	}
-
-	data, err := base64Decode(keys[1])
+	jwksuri, err := pc.getJWKSURI(ctx)
 	if err != nil {
-		return "", nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: invalid id_token")
+		return "", nil, err
 	}
 
-	var idType idTypeGoole
-	if err := json.Unmarshal(data, &idType); err != nil {
-		return "", nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: invalid id_token")
-	}
+	// parse id_token and validate.
+	var idType idTypeGoogle
+	_, err = jwt.ParseWithClaims(extra, &idType, func(token *jwt.Token) (interface{}, error) {
+		ikid, ok := token.Header["kid"]
+		if !ok {
+			return nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: kid is not found")
+		}
+		kid, ok := ikid.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid kid type: %T", ikid)
+		}
+		for _, key := range jwksuri.Keys {
+			if key.Kid == kid {
+				return key.DecodePublicKey()
+			}
+		}
+		return nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: kid is not found")
+	})
 	info["email"] = idType.Email
 
 	if len(pc.restrictions) > 0 {
@@ -156,4 +187,35 @@ func (pc providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Config
 	}
 
 	return idType.Sub, info, nil
+}
+
+func (pc *providerConfigGoogle) getJWKSURI(ctx context.Context) (googleJWKSURI, error) {
+	now := time.Now()
+	pc.mu.RLock()
+	if !pc.expireAt.IsZero() && pc.expireAt.After(now) {
+		// jwksuri cache is not expired.
+		pc.mu.RUnlock()
+		return pc.jwksuri, nil
+	}
+
+	// try to update jwksuri
+	pc.mu.RUnlock()
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
+	if !pc.expireAt.IsZero() && pc.expireAt.After(now) {
+		// another goroutine updates jwksuri
+		return pc.jwksuri, nil
+	}
+
+	// update jwksuri
+	var conf googleOpenIDConfiguration
+	if err := parseJSONFromURL(ctx, googleOpenIDConfigurationURL, &conf); err != nil {
+		return googleJWKSURI{}, err
+	}
+	if err := parseJSONFromURL(ctx, conf.JWKSURI, &pc.jwksuri); err != nil {
+		return googleJWKSURI{}, err
+	}
+
+	pc.expireAt = now.Add(24 * time.Hour)
+	return pc.jwksuri, nil
 }
