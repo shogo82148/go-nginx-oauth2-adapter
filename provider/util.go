@@ -1,7 +1,10 @@
 package provider
 
 import (
+	"context"
 	"encoding/base64"
+	"encoding/json"
+	"net/http"
 	"os"
 )
 
@@ -30,4 +33,20 @@ func base64Decode(s string) ([]byte, error) {
 		s += "="
 	}
 	return base64.URLEncoding.DecodeString(s)
+}
+
+func parseJSONFromURL(ctx context.Context, u string, v interface{}) error {
+	req, err := http.NewRequest(http.MethodGet, u, nil)
+	if err != nil {
+		return err
+	}
+	req = req.WithContext(ctx)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	dec := json.NewDecoder(resp.Body)
+	return dec.Decode(v)
 }

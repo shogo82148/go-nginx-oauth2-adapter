@@ -8,6 +8,12 @@
   version = "v0.9.0"
 
 [[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
+  version = "v3.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -36,6 +42,12 @@
   name = "github.com/lestrrat/go-server-starter"
   packages = ["listener"]
   revision = "f9cb0b066498d26a90fd918fe265adbb0ea02bcf"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mendsley/gojwk"
+  packages = ["."]
+  revision = "4d5ec6e58103388d6cb0d7d72bc72649be4f0504"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -76,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f78d618ed5ef75dfeb5beb983ecd0eec2d88fdd47209bb65faeef7025bb14fda"
+  inputs-digest = "374834499b7ba30a3ca3b4d55b27588f5550e8f89949daf26b36b40eff2b7d12"
   solver-name = "gps-cdcl"
   solver-version = 1
