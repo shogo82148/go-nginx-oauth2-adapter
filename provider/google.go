@@ -46,7 +46,7 @@ type profileGoole struct {
 	Sub           string `json:"sub"`
 	Profile       string `json:"profile"`
 	Email         string `json:"email"`
-	EmailVerified string `json:"email_verified"`
+	EmailVerified bool   `json:"email_verified"`
 }
 type idTypeGoogle struct {
 	Sub   string `json:"sub"`
@@ -141,6 +141,9 @@ func (pc *providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Confi
 		}
 		return nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: kid is not found")
 	})
+	if err != nil {
+		errors.New("shogo82148/go-nginx-oauth2-adapter/provider: fail to validate id_token")
+	}
 	info["email"] = idType.Email
 
 	if len(pc.restrictions) > 0 {
@@ -166,7 +169,7 @@ func (pc *providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Confi
 	// get detail of profile
 	if pc.enabledProfile {
 		client := c.Client(ctx, t)
-		resp, err := client.Get("https://www.googleapis.com/plus/v1/people/me/openIdConnect")
+		resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 		if err != nil {
 			return "", nil, err
 		}
