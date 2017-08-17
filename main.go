@@ -70,6 +70,7 @@ func Main(args []string) int {
 		}).Error("error while parsing configure")
 		return 1
 	}
+	c.ConfigTest = configtest
 
 	s, err := NewServer(*c)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	crand "crypto/rand"
 	"encoding/base64"
 	"encoding/gob"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -69,17 +70,50 @@ func NewServer(config Config) (*Server, error) {
 		return nil, ErrProviderConfigNotFound
 	}
 
+	// Decode secrets and set up the session store.
 	secrets := make([][]byte, len(s.Config.Secrets))
 	for i, secret := range s.Config.Secrets {
-		if secret != nil {
-			secrets[i] = []byte(*secret)
+		isAuthKey := i%2 == 0
+		if secret == nil {
+			if isAuthKey {
+				logrus.Warn("The session authentication key is empty. you should set secure random hex string.")
+				secrets[i] = []byte("dummy-session-authentication-key")
+				if s.Config.ConfigTest {
+					return nil, errors.New("shogo82148/go-nginx-oauth2-adapter: the session authentication key is empty")
+				}
+			}
+			continue
+		}
+		var err error
+		if isAuthKey {
+			switch len(*secret) {
+			case 32, 64:
+				secrets[i] = []byte(*secret)
+			case 128:
+				secrets[i], err = hex.DecodeString(*secret)
+			default:
+				err = errors.New("shogo82148/go-nginx-oauth2-adapter: invalid session authentication key length")
+			}
 		} else {
-			secrets[i] = nil
+			switch len(*secret) {
+			case 16, 24, 32:
+				secrets[i] = []byte(*secret)
+			case 48, 64:
+				secrets[i], err = hex.DecodeString(*secret)
+			default:
+				err = errors.New("shogo82148/go-nginx-oauth2-adapter: invalid session authentication key length")
+			}
+		}
+		if err != nil {
+			return nil, err
 		}
 	}
 	if len(secrets) == 0 {
-		logrus.Warn("session secrets is empty. you should set secure random string.")
-		secrets = [][]byte{[]byte("secret-for-development")}
+		logrus.Warn("The session authentication key is empty. you should set secure random hex string.")
+		secrets = append(secrets, []byte("dummy-session-authentication-key"))
+		if s.Config.ConfigTest {
+			return nil, errors.New("adapter: the session authentication key is empty")
+		}
 	}
 	store := sessions.NewCookieStore(secrets...)
 	store.Options = config.Cookie.Options()

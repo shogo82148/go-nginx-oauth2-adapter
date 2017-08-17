@@ -17,6 +17,9 @@ type Config struct {
 	Providers          map[string]map[string]interface{} `yaml:"providers" json:"providers"`
 	AppRefreshInterval string                            `yaml:"app_refresh_interval" json:"app_refresh_interval"`
 
+	// set with -configtest option.
+	ConfigTest bool `yaml:"-" json:"-"`
+
 	// Fields are a subset of http.Cookie fields.
 	Cookie *CookieConfig `yaml:"cookie" json:"cookie"`
 }
@@ -105,6 +108,9 @@ func (c *Config) LoadEnv() error {
 
 // Options returns the sesseion config.
 func (c *CookieConfig) Options() *sessions.Options {
+	if c == nil {
+		return &sessions.Options{}
+	}
 	return &sessions.Options{
 		Path:     c.Path,
 		Domain:   c.Domain,
