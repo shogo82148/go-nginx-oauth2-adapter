@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -23,6 +24,7 @@ var ErrProviderConfigNotFound = errors.New("shogo82148/go-nginx-oauth2-adapter: 
 var ErrForbidden = errors.New("shogo82148/go-nginx-oauth2-adapter/provider: access forbidden")
 
 // fallback for "crypto/rand"
+var mu sync.Mutex
 var myRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 // Server is the go-nginx-oauth2-adapter server.
@@ -400,6 +402,14 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 func generateNewState() string {
 	data := make([]byte, 32)
 	if n, err := crand.Read(data); err != nil || n != len(data) {
+		f := logrus.Fields{}
+		if err != nil {
+			f["err"] = err.Error()
+		}
+		logrus.WithFields(f).Warn("failed to generate secure random state. fallback to insecure pseudo random.")
+
+		mu.Lock()
+		defer mu.Unlock()
 		// fallback insecure pseudo random
 		for i := range data {
 			data[i] = byte(myRand.Intn(256))
