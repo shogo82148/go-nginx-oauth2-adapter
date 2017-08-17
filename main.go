@@ -59,7 +59,7 @@ func Main(args []string) int {
 
 	if genKey {
 		fmt.Println(hex.EncodeToString(securecookie.GenerateRandomKey(64)))
-		fmt.Println(hex.EncodeToString(securecookie.GenerateRandomKey(64)))
+		fmt.Println(hex.EncodeToString(securecookie.GenerateRandomKey(32)))
 		return 0
 	}
 
