@@ -4,11 +4,13 @@ import (
 	crand "crypto/rand"
 	"encoding/base64"
 	"encoding/gob"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -22,6 +24,7 @@ var ErrProviderConfigNotFound = errors.New("shogo82148/go-nginx-oauth2-adapter: 
 var ErrForbidden = errors.New("shogo82148/go-nginx-oauth2-adapter/provider: access forbidden")
 
 // fallback for "crypto/rand"
+var mu sync.Mutex
 var myRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 // Server is the go-nginx-oauth2-adapter server.
@@ -69,17 +72,50 @@ func NewServer(config Config) (*Server, error) {
 		return nil, ErrProviderConfigNotFound
 	}
 
+	// Decode secrets and set up the session store.
 	secrets := make([][]byte, len(s.Config.Secrets))
 	for i, secret := range s.Config.Secrets {
-		if secret != nil {
-			secrets[i] = []byte(*secret)
+		isAuthKey := i%2 == 0
+		if secret == nil {
+			if isAuthKey {
+				logrus.Warn("The session authentication key is empty. you should set secure random hex string.")
+				secrets[i] = []byte("dummy-session-authentication-key")
+				if s.Config.ConfigTest {
+					return nil, errors.New("shogo82148/go-nginx-oauth2-adapter: the session authentication key is empty")
+				}
+			}
+			continue
+		}
+		var err error
+		if isAuthKey {
+			switch len(*secret) {
+			case 32, 64:
+				secrets[i] = []byte(*secret)
+			case 128:
+				secrets[i], err = hex.DecodeString(*secret)
+			default:
+				err = errors.New("shogo82148/go-nginx-oauth2-adapter: invalid session authentication key length")
+			}
 		} else {
-			secrets[i] = nil
+			switch len(*secret) {
+			case 16, 24, 32:
+				secrets[i] = []byte(*secret)
+			case 48, 64:
+				secrets[i], err = hex.DecodeString(*secret)
+			default:
+				err = errors.New("shogo82148/go-nginx-oauth2-adapter: invalid session authentication key length")
+			}
+		}
+		if err != nil {
+			return nil, err
 		}
 	}
 	if len(secrets) == 0 {
-		logrus.Warn("session secrets is empty. you should set secure random string.")
-		secrets = [][]byte{[]byte("secret-for-development")}
+		logrus.Warn("The session authentication key is empty. you should set secure random hex string.")
+		secrets = append(secrets, []byte("dummy-session-authentication-key"))
+		if s.Config.ConfigTest {
+			return nil, errors.New("adapter: the session authentication key is empty")
+		}
 	}
 	store := sessions.NewCookieStore(secrets...)
 	store.Options = config.Cookie.Options()
@@ -366,6 +402,14 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 func generateNewState() string {
 	data := make([]byte, 32)
 	if n, err := crand.Read(data); err != nil || n != len(data) {
+		f := logrus.Fields{}
+		if err != nil {
+			f["err"] = err.Error()
+		}
+		logrus.WithFields(f).Warn("failed to generate secure random state. fallback to insecure pseudo random.")
+
+		mu.Lock()
+		defer mu.Unlock()
 		// fallback insecure pseudo random
 		for i := range data {
 			data[i] = byte(myRand.Intn(256))

@@ -142,7 +142,7 @@ func (pc *providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Confi
 		return nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: kid is not found")
 	})
 	if err != nil {
-		errors.New("shogo82148/go-nginx-oauth2-adapter/provider: fail to validate id_token")
+		return "", nil, errors.New("shogo82148/go-nginx-oauth2-adapter/provider: fail to validate id_token")
 	}
 	info["email"] = idType.Email
 

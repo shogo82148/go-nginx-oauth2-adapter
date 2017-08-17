@@ -23,7 +23,8 @@ The example of configuration file.
 address: ":18081" # listen address
 
 # secret tokens to authenticate/encrypt cookie.
-# see http://www.gorillatoolkit.org/pkg/sessions for more detail
+# see http://www.gorillatoolkit.org/pkg/sessions for more detail.
+# use `-genkey` option to create strong keys.
 secrets:
   - new-authentication-key
   - new-encryption-key
@@ -37,8 +38,8 @@ cookie:
   path: /
   domain:
   max_age: 0
-  secure: false
-  http_only: false
+  secure: true # default: false. It is recommended to set true.
+  http_only: true # default: false. It is recommended to set true.
 
 providers:
   # development: {} # For test.
