@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"context"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"net"
@@ -11,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/securecookie"
 	"github.com/lestrrat/go-server-starter/listener"
 	"github.com/sirupsen/logrus"
 )
@@ -26,6 +28,7 @@ func Main(args []string) int {
 	var configtest bool
 	var showVersion bool
 	var showHelp bool
+	var genKey bool
 	flagSet.StringVar(&configFile, "c", "", "configuration file")
 	flagSet.StringVar(&configFile, "config", "", "configuration file")
 	flagSet.BoolVar(&configtest, "t", false, "test configuration and exit")
@@ -34,6 +37,8 @@ func Main(args []string) int {
 	flagSet.BoolVar(&showVersion, "version", false, "show version information")
 	flagSet.BoolVar(&showHelp, "h", false, "show help")
 	flagSet.BoolVar(&showHelp, "help", false, "show help")
+	flagSet.BoolVar(&genKey, "g", false, "shorthand of genkey")
+	flagSet.BoolVar(&genKey, "genkey", false, "generate random key for cookie")
 	err := flagSet.Parse(args[1:])
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -49,6 +54,12 @@ func Main(args []string) int {
 
 	if showHelp {
 		flagSet.Usage()
+		return 0
+	}
+
+	if genKey {
+		fmt.Println(hex.EncodeToString(securecookie.GenerateRandomKey(64)))
+		fmt.Println(hex.EncodeToString(securecookie.GenerateRandomKey(64)))
 		return 0
 	}
 
