@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
 )
@@ -135,6 +136,8 @@ func NewServer(config Config) (*Server, error) {
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer context.Clear(r)
+
 	switch r.URL.Path {
 	case "/test":
 		s.HandlerTest(w, r)
