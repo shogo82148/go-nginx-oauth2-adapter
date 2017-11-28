@@ -3,7 +3,7 @@
 set -x
 set -e
 
-H2O_VERSION=2.2.2
+H2O_VERSION=2.2.3
 
 if [[ ! -d "$HOME/h2o-$H2O_VERSION" ]]; then
     cd ~/
