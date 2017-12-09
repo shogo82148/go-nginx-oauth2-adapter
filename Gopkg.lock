@@ -39,6 +39,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/gregjones/httpcache"
+  packages = ["."]
+  revision = "2bcd89a1743fd4b373f7370ce8ddc14dfbd18229"
+
+[[projects]]
+  branch = "master"
   name = "github.com/lestrrat/go-server-starter"
   packages = ["listener"]
   revision = "f9cb0b066498d26a90fd918fe265adbb0ea02bcf"
@@ -94,6 +100,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "374834499b7ba30a3ca3b4d55b27588f5550e8f89949daf26b36b40eff2b7d12"
+  inputs-digest = "484043c07482d7c6711930799668eca237c65160b2b96fe1d663df3a1ef3f7d0"
   solver-name = "gps-cdcl"
   solver-version = 1
