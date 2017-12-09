@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/mendsley/gojwk"
@@ -24,9 +23,8 @@ type providerConfigGoogle struct {
 	enabledProfile bool
 	restrictions   []string
 
-	mu       sync.RWMutex
-	jwksuri  googleJWKSURI
-	expireAt time.Time
+	mu      sync.RWMutex
+	jwksuri googleJWKSURI
 }
 type googleOpenIDConfiguration struct {
 	JWKSURI string `json:"jwks_uri"`
@@ -193,37 +191,13 @@ func (pc *providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Confi
 }
 
 func (pc *providerConfigGoogle) getJWKSURI(ctx context.Context) (googleJWKSURI, error) {
-	now := time.Now()
-	pc.mu.RLock()
-	if !pc.expireAt.IsZero() && pc.expireAt.After(now) {
-		// jwksuri cache is not expired.
-		pc.mu.RUnlock()
-		return pc.jwksuri, nil
-	}
-
-	// try to update jwksuri
-	pc.mu.RUnlock()
-	pc.mu.Lock()
-	defer pc.mu.Unlock()
-	if !pc.expireAt.IsZero() && pc.expireAt.After(now) {
-		// another goroutine updates jwksuri
-		return pc.jwksuri, nil
-	}
-
-	// update jwksuri
 	var conf googleOpenIDConfiguration
-	if _, err := parseJSONFromURL(ctx, googleOpenIDConfigurationURL, &conf); err != nil {
+	if err := parseJSONFromURL(ctx, googleOpenIDConfigurationURL, &conf); err != nil {
 		return googleJWKSURI{}, err
 	}
-	expires, err := parseJSONFromURL(ctx, conf.JWKSURI, &pc.jwksuri)
-	if err != nil {
+	if err := parseJSONFromURL(ctx, conf.JWKSURI, &pc.jwksuri); err != nil {
 		return googleJWKSURI{}, err
 	}
 
-	if expires != nil || expires.Before(now.Add(24*time.Hour)) {
-		pc.expireAt = *expires
-	} else {
-		pc.expireAt = now.Add(24 * time.Hour)
-	}
 	return pc.jwksuri, nil
 }
