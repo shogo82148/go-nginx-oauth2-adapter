@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"time"
 )
 
 func getConfigString(configFile map[string]interface{}, key string, envName string) string {
@@ -35,18 +36,25 @@ func base64Decode(s string) ([]byte, error) {
 	return base64.URLEncoding.DecodeString(s)
 }
 
-func parseJSONFromURL(ctx context.Context, u string, v interface{}) error {
+func parseJSONFromURL(ctx context.Context, u string, v interface{}) (*time.Time, error) {
 	req, err := http.NewRequest(http.MethodGet, u, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req = req.WithContext(ctx)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	dec := json.NewDecoder(resp.Body)
-	return dec.Decode(v)
+	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
+		return nil, err
+	}
+
+	expires, err := time.Parse(time.RFC1123, resp.Header.Get("Expires"))
+	if err != nil {
+		return nil, nil
+	}
+	return &expires, nil
 }

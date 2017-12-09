@@ -212,13 +212,18 @@ func (pc *providerConfigGoogle) getJWKSURI(ctx context.Context) (googleJWKSURI, 
 
 	// update jwksuri
 	var conf googleOpenIDConfiguration
-	if err := parseJSONFromURL(ctx, googleOpenIDConfigurationURL, &conf); err != nil {
+	if _, err := parseJSONFromURL(ctx, googleOpenIDConfigurationURL, &conf); err != nil {
 		return googleJWKSURI{}, err
 	}
-	if err := parseJSONFromURL(ctx, conf.JWKSURI, &pc.jwksuri); err != nil {
+	expires, err := parseJSONFromURL(ctx, conf.JWKSURI, &pc.jwksuri)
+	if err != nil {
 		return googleJWKSURI{}, err
 	}
 
-	pc.expireAt = now.Add(24 * time.Hour)
+	if expires != nil || expires.Before(now.Add(24*time.Hour)) {
+		pc.expireAt = *expires
+	} else {
+		pc.expireAt = now.Add(24 * time.Hour)
+	}
 	return pc.jwksuri, nil
 }
