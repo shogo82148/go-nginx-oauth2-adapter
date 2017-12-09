@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/gregjones/httpcache"
 	"net/http"
 	"os"
-	"time"
 )
+
+var cacheTransport = httpcache.NewMemoryCacheTransport()
 
 func getConfigString(configFile map[string]interface{}, key string, envName string) string {
 	// load a value from config file
@@ -36,25 +38,17 @@ func base64Decode(s string) ([]byte, error) {
 	return base64.URLEncoding.DecodeString(s)
 }
 
-func parseJSONFromURL(ctx context.Context, u string, v interface{}) (*time.Time, error) {
+func parseJSONFromURL(ctx context.Context, u string, v interface{}) error {
 	req, err := http.NewRequest(http.MethodGet, u, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	req = req.WithContext(ctx)
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := cacheTransport.Client().Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close()
 
-	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
-		return nil, err
-	}
-
-	expires, err := time.Parse(time.RFC1123, resp.Header.Get("Expires"))
-	if err != nil {
-		return nil, nil
-	}
-	return &expires, nil
+	return json.NewDecoder(resp.Body).Decode(v)
 }
