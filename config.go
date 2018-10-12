@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/sessions"
 	"gopkg.in/yaml.v2"
@@ -88,7 +89,9 @@ func (c *Config) LoadEnv() error {
 	}
 
 	if v := os.Getenv("NGX_OMNIAUTH_SESSION_SECRET"); v != "" {
-		c.Secrets = []*string{&v}
+		for _, v := range strings.Split(v, ",") {
+			c.Secrets = append(c.Secrets, &v)
+		}
 	}
 
 	if v := os.Getenv("NGX_OMNIAUTH_SESSION_COOKIE_NAME"); v != "" {
