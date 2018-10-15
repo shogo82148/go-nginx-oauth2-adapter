@@ -90,6 +90,7 @@ func (c *Config) LoadEnv() error {
 
 	if v := os.Getenv("NGX_OMNIAUTH_SESSION_SECRET"); v != "" {
 		for _, v := range strings.Split(v, ",") {
+			v := v
 			c.Secrets = append(c.Secrets, &v)
 		}
 	}
