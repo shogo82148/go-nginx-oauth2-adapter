@@ -67,11 +67,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1e9ca50ef3425afdb2fd2041606e5d5869d8f5d497742b1b63d9553be852478d"
-  name = "github.com/lestrrat/go-server-starter"
+  digest = "1:636aaa0cec12b3f2fb58652e812c7508b3bb3f8d61f5461c68a515f116d11ced"
+  name = "github.com/lestrrat-go/server-starter"
   packages = ["listener"]
   pruneopts = ""
-  revision = "6ac0b358431b798d3db8933ef547464e4ce74d9d"
+  revision = "e24b30b99ae6ed143a7166ab4bd62b570af55822"
 
 [[projects]]
   branch = "master"
@@ -169,7 +169,7 @@
     "github.com/gorilla/securecookie",
     "github.com/gorilla/sessions",
     "github.com/gregjones/httpcache",
-    "github.com/lestrrat/go-server-starter/listener",
+    "github.com/lestrrat-go/server-starter/listener",
     "github.com/mendsley/gojwk",
     "github.com/sirupsen/logrus",
     "golang.org/x/oauth2",

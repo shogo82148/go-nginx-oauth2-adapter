@@ -63,7 +63,8 @@ func (pc providerConfigDevelopment) ServeHTTP(w http.ResponseWriter, r *http.Req
 		v.Add("code", "development-code")
 		http.Redirect(w, r, r.FormValue("redirect_uri")+"?"+v.Encode(), http.StatusFound)
 	case "/token":
-		fmt.Fprintln(w, "{}")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(w, `{"access_token":"hogehoge"}`)
 	default:
 		http.NotFound(w, r)
 	}

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/securecookie"
-	"github.com/lestrrat/go-server-starter/listener"
+	"github.com/lestrrat-go/server-starter/listener"
 	"github.com/sirupsen/logrus"
 )
 
