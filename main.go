@@ -18,7 +18,7 @@ import (
 )
 
 // Version is the version of go-nginx-oauth2-adapter.
-const Version = "0.3.3"
+const Version = "0.4.0"
 
 // Main starts the go-nginx-oauth2-adapter server.
 func Main(args []string) int {
