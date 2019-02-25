@@ -12,12 +12,6 @@ ARCHIVER=$(CURDIR)/archiver-$(shell go env GOOS)-$(shell go env GOARCH)/archiver
 
 all: build-windows-386 build-windows-amd64 build-linux-386 build-linux-amd64 build-darwin-386 build-darwin-amd64
 
-#### dependency management
-
-installdeps:
-	go get github.com/golang/dep/cmd/dep
-	dep ensure
-
 ##### build settings
 
 .PHONY: build build-windows-amd64 build-windows-386 build-linux-amd64 build-linux-386 build-darwin-amd64 build-darwin-386

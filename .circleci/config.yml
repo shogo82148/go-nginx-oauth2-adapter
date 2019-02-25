@@ -3,7 +3,9 @@ jobs:
   build:
     working_directory: /go/src/github.com/shogo82148/go-nginx-oauth2-adapter
     docker:
-      - image: circleci/golang:1.11.1
+      - image: circleci/golang:1.11.5
+        environment:
+          GO111MODULE: "on"
     steps:
       - checkout
       - run:
@@ -14,7 +16,6 @@ jobs:
             sudo chmod -R 777 /var/log/nginx
             sudo chmod -R 777 /var/lib/nginx
             bash ./circle-ci-install-h2o.sh
-            make installdeps
       - run:
           name: Test
           command: go build -v && make test
