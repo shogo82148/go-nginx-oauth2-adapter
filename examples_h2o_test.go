@@ -57,17 +57,15 @@ func TestH2O(t *testing.T) {
 	go http.ListenAndServe(":18081", s)
 
 	go http.ListenAndServe(":18082", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		// XXX: it seems that h2o does not support to modify requests :(
-		// if got, expected := r.Header.Get("x-ngx-omniauth-provider"), "development"; got != expected {
-		// 	t.Errorf("want %s, got %s", expected, git)
-		// }
-		// if got, expected := r.Header.Get("x-ngx-omniauth-user"), "developer"; got != expected {
-		// 	t.Errorf("want %s, got %s", expected, git)
-		// }
-		// if r.Header.Get("x-ngx-omniauth-info") == "" {
-		// 	t.Errorf("want x-ngx-omniauth-info is set, but empty")
-		// }
+		if got, expected := r.Header.Get("x-ngx-omniauth-provider"), "development"; got != expected {
+			t.Errorf("want %s, got %s", expected, got)
+		}
+		if got, expected := r.Header.Get("x-ngx-omniauth-user"), "developer"; got != expected {
+			t.Errorf("want %s, got %s", expected, got)
+		}
+		if r.Header.Get("x-ngx-omniauth-info") == "" {
+			t.Errorf("want x-ngx-omniauth-info is set, but empty")
+		}
 
 		fmt.Fprintln(w, "Hello, client")
 	}))
