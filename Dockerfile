@@ -1,4 +1,4 @@
-FROM golang:1.11.5 as builder
+FROM golang:1.13.1 as builder
 WORKDIR /go/src/github.com/shogo82148/go-nginx-oauth2-adapter
 COPY . .
 RUN GO111MODULE=on CGO_ENABLED=0 go build -o go-nginx-oauth2-adapter ./cli/go-nginx-oauth2-adapter
