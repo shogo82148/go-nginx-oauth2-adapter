@@ -21,7 +21,7 @@ $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH):
 
 $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/go-nginx-oauth2-adapter$(SUFFIX): $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH) $(SRC_FILES)
 	@echo " * Building binary for $(GOOS)/$(GOARCH)..."
-	@CGO_ENABLED=0 go build -o $@ cli/go-nginx-oauth2-adapter/main.go
+	@./run-in-docker.sh go build -o $@ cli/go-nginx-oauth2-adapter/main.go
 
 build: $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/go-nginx-oauth2-adapter$(SUFFIX)
 
@@ -91,4 +91,8 @@ test:
 	go test -v -race ./...
 
 clean:
-	-rm -rf vendor
+	rm -rf vendor
+	rm -rf artifacts
+	rm -rf release
+	if [ -e .mod ] ; then chmod -R +w .mod/; fi
+	rm -rf .mod

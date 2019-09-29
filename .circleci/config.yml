@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /go/src/github.com/shogo82148/go-nginx-oauth2-adapter
     docker:
-      - image: circleci/golang:1.11.5
+      - image: circleci/golang:1.13.1
         environment:
           GO111MODULE: "on"
     steps:
