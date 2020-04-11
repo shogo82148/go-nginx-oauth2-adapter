@@ -35,6 +35,9 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
+      - name: download dependencies
+        run: go mod download
       - name: Test
         run: |
           make test
