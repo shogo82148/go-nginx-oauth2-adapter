@@ -57,7 +57,7 @@ require (
 	golang.org/x/perf v0.0.0-20190124201629-844a5f5b46f4 // indirect
 	golang.org/x/sys v0.0.0-20190927073244-c990c680b611 // indirect
 	google.golang.org/appengine v1.6.4 // indirect
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.3.0
 	sourcegraph.com/sqs/pbtypes v1.0.0 // indirect
 )
 
