@@ -2,7 +2,7 @@
 
 set -eux
 
-H2O_VERSION=2.2.5
+H2O_VERSION=2.2.6
 
 if [[ ! -d "$HOME/h2o-$H2O_VERSION" ]]; then
     cd ~/
