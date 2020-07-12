@@ -5,6 +5,13 @@ set -eux
 CURRENT=$(cd "$(dirname "$0")" && pwd)
 H2O_VERSION=2.2.6
 
+echo "::add-path::$CURRENT/h2o/bin"
+
+if "$CURRENT/h2o/bin/h2o" --version | grep -F "h2o version $H2O_VERSION"; then
+    : "h2o version $H2O_VERSION is already installed. nothing to do."
+    exit 0
+fi
+
 if [[ ! -d "$CURRENT/tmp/h2o-$H2O_VERSION" ]]; then
     mkdir -p "$CURRENT/tmp"
     cd "$CURRENT/tmp"
@@ -17,5 +24,3 @@ cd "$CURRENT/tmp/h2o-$H2O_VERSION"
 cmake -DWITH_BUNDLED_SSL=on -DWITH_MRUBY=on -DCMAKE_INSTALL_PREFIX="$CURRENT/h2o" .
 make
 make install
-
-echo "::add-path::$CURRENT/h2o/bin"

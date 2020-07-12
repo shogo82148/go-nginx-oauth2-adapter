@@ -17,12 +17,25 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
-      - uses: actions/cache@v1
+      - name: restore go.mod cache
+        uses: actions/cache@v1
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
+      - name: restore h2o binary
+        uses: actions/cache@v1
+        with:
+          path: .github/h2o
+          key: ${{ runner.os }}-h2o-${{ hashFiles('.github/install-h2o.sh') }}
+
+      - name: restore nginx binary
+        uses: actions/cache@v1
+        with:
+          path: .github/nginx
+          key: ${{ runner.os }}-nginx-${{ hashFiles('.github/install-nginx.sh') }}
 
       - name: install h2o for test
         run:
