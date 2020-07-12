@@ -27,6 +27,9 @@ jobs:
       - name: install h2o for test
         run:
           .github/install-h2o.sh
+      - name: install nginx for test
+        run:
+          .github/install-nginx.sh
 
       - name: download dependencies
         run: go mod download
