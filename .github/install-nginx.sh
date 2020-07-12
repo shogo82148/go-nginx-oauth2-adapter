@@ -21,6 +21,6 @@ fi
 
 rm -rf "$CURRENT/nginx"
 cd "$CURRENT/tmp/nginx-$NGINX_VERSION"
-./configure --prefix="$CURRENT/nginx"
+./configure --prefix="$CURRENT/nginx" --with-http_auth_request_module
 make
 make install
