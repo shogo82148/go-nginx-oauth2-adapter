@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/gregjones/httpcache"
 	"net/http"
 	"os"
+
+	"github.com/gregjones/httpcache"
 )
 
 var cacheTransport = httpcache.NewMemoryCacheTransport()

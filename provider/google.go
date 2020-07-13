@@ -10,7 +10,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/mendsley/gojwk"
-	"github.com/shogo82148/go-nginx-oauth2-adapter"
+	adapter "github.com/shogo82148/go-nginx-oauth2-adapter"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -33,7 +33,7 @@ type googleJWKSURI struct {
 	Keys []gojwk.Key `json:"keys"`
 }
 
-type profileGoole struct {
+type profileGoogle struct {
 	Gender        string `json:"gender"`
 	Name          string `json:"name"`
 	FamilyName    string `json:"family_name"`
@@ -173,7 +173,7 @@ func (pc *providerConfigGoogle) InfoContext(ctx context.Context, c *oauth2.Confi
 		}
 		defer resp.Body.Close()
 
-		var profile profileGoole
+		var profile profileGoogle
 		decoder := json.NewDecoder(resp.Body)
 		if err := decoder.Decode(&profile); err != nil {
 			return "", nil, err

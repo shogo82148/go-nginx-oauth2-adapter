@@ -239,7 +239,7 @@ func (s *Server) HandlerTest(w http.ResponseWriter, r *http.Request) {
 
 // HandlerInitiate redirects to authorization page.
 func (s *Server) HandlerInitiate(w http.ResponseWriter, r *http.Request) {
-	// ignore error bacause we don't need privious session values.
+	// ignore error because we don't need previous session values.
 	session, _ := s.SessionStore.Get(r, s.Config.SessionName)
 
 	conf := s.ProviderConfigs[s.DefaultProvider].Config()
@@ -343,7 +343,7 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err.Error(),
-		}).Info("oauth verification faild")
+		}).Info("oauth verification failed")
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 		return
 	}
