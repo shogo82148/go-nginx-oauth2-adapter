@@ -20,7 +20,7 @@ $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH):
 
 $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/go-nginx-oauth2-adapter$(SUFFIX): $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH) $(SRC_FILES)
 	@echo " * Building binary for $(GOOS)/$(GOARCH)..."
-	@./run-in-docker.sh go build -o $@ cli/go-nginx-oauth2-adapter/main.go
+	@./run-in-docker.sh go build -o artifacts/$(VERSION)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/go-nginx-oauth2-adapter$(SUFFIX) cli/go-nginx-oauth2-adapter/main.go
 
 build: $(ARTIFACTS_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/go-nginx-oauth2-adapter$(SUFFIX)
 
