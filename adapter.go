@@ -8,9 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/gorilla/context"
@@ -23,10 +21,6 @@ var ErrProviderConfigNotFound = errors.New("shogo82148/go-nginx-oauth2-adapter: 
 
 // ErrForbidden is the error which the access is forbidden.
 var ErrForbidden = errors.New("shogo82148/go-nginx-oauth2-adapter/provider: access forbidden")
-
-// fallback for "crypto/rand"
-var mu sync.Mutex
-var myRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 // Server is the go-nginx-oauth2-adapter server.
 type Server struct {
@@ -403,22 +397,11 @@ func (s *Server) HandlerCallback(w http.ResponseWriter, r *http.Request) {
 
 // generateNewState generate secure random state
 func generateNewState() string {
-	data := make([]byte, 32)
-	if n, err := crand.Read(data); err != nil || n != len(data) {
-		f := logrus.Fields{}
-		if err != nil {
-			f["err"] = err.Error()
-		}
-		logrus.WithFields(f).Warn("failed to generate secure random state. fallback to insecure pseudo random.")
-
-		mu.Lock()
-		defer mu.Unlock()
-		// fallback insecure pseudo random
-		for i := range data {
-			data[i] = byte(myRand.Intn(256))
-		}
+	var data [32]byte
+	if _, err := crand.Read(data[:]); err != nil {
+		panic(err)
 	}
-	return base64.URLEncoding.EncodeToString(data)
+	return base64.URLEncoding.EncodeToString(data[:])
 }
 
 // encodeInfo encodes the user information for embeding to http header.
