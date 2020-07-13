@@ -1,7 +1,7 @@
-FROM golang:1.13.1 as builder
+FROM golang:1.14.4 as builder
 WORKDIR /go/src/github.com/shogo82148/go-nginx-oauth2-adapter
 
-# Faster builds in Docker with Go 1.11
+# Faster builds in Docker with Go 1.11 or later
 # https://container-solutions.com/faster-builds-in-docker-with-go-1-11/
 COPY go.mod .
 COPY go.sum .
