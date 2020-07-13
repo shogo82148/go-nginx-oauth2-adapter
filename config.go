@@ -110,7 +110,7 @@ func (c *Config) LoadEnv() error {
 	return nil
 }
 
-// Options returns the sesseion config.
+// Options returns the session config.
 func (c *CookieConfig) Options() *sessions.Options {
 	if c == nil {
 		return &sessions.Options{}
