@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/shogo82148/go-nginx-oauth2-adapter.svg?style=svg)](https://circleci.com/gh/shogo82148/go-nginx-oauth2-adapter)
+![test](https://github.com/shogo82148/go-nginx-oauth2-adapter/workflows/test/badge.svg)
 
 # go-nginx-oauth2-adapter
 
