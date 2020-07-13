@@ -31,7 +31,7 @@ var myRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 // Server is the go-nginx-oauth2-adapter server.
 type Server struct {
 	Config             Config
-	DefaultPrivider    string
+	DefaultProvider    string
 	ProviderConfigs    map[string]ProviderConfig
 	SessionStore       sessions.Store
 	AppRefreshInterval time.Duration
@@ -63,13 +63,13 @@ func NewServer(config Config) (*Server, error) {
 			return nil, err
 		}
 		s.ProviderConfigs[name] = providerConfig
-		if s.DefaultPrivider != "" {
+		if s.DefaultProvider != "" {
 			return nil, errors.New("shogo82148/go-nginx-oauth2-adapter: multiple providers are not supported")
 		}
-		s.DefaultPrivider = name
+		s.DefaultProvider = name
 	}
 
-	if s.DefaultPrivider == "" {
+	if s.DefaultProvider == "" {
 		return nil, ErrProviderConfigNotFound
 	}
 
@@ -248,14 +248,14 @@ func (s *Server) HandlerInitiate(w http.ResponseWriter, r *http.Request) {
 	// ignore error bacause we don't need privious session values.
 	session, _ := s.SessionStore.Get(r, s.Config.SessionName)
 
-	conf := s.ProviderConfigs[s.DefaultPrivider].Config()
+	conf := s.ProviderConfigs[s.DefaultProvider].Config()
 	callback := r.Header.Get("x-ngx-omniauth-initiate-callback")
 	next := r.Header.Get("x-ngx-omniauth-initiate-back-to")
 	state := generateNewState()
 
 	conf.RedirectURL = callback
 	session.Values = map[interface{}]interface{}{}
-	session.Values["provider"] = s.DefaultPrivider
+	session.Values["provider"] = s.DefaultProvider
 	session.Values["callback"] = callback
 	session.Values["next"] = next
 	session.Values["state"] = state
