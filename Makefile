@@ -6,7 +6,6 @@ ARTIFACTS_DIR=$(CURDIR)/artifacts/$(VERSION)
 RELEASE_DIR=$(CURDIR)/release/$(VERSION)
 SRC_FILES = $(wildcard *.go cli/go-nginx-oauth2-adapter/*.go provider/*.go)
 GITHUB_USERNAME=shogo82148
-ARCHIVER=$(CURDIR)/archiver-$(shell go env GOOS)-$(shell go env GOARCH)/archiver
 
 .PHONY: all test clean
 
@@ -54,20 +53,29 @@ $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH):
 release-windows-amd64:
 	@$(MAKE) release-zip GOOS=windows GOARCH=amd64 SUFFIX=.exe
 
+release-windows-arm64:
+	@$(MAKE) release-zip GOOS=windows GOARCH=arm64 SUFFIX=.exe
+
 release-windows-386:
 	@$(MAKE) release-zip GOOS=windows GOARCH=386 SUFFIX=.exe
 
 release-linux-amd64:
 	@$(MAKE) release-targz GOOS=linux GOARCH=amd64
 
+release-linux-arm64:
+	@$(MAKE) release-targz GOOS=linux GOARCH=arm64
+
 release-linux-386:
 	@$(MAKE) release-targz GOOS=linux GOARCH=386
 
 release-darwin-amd64:
-	@$(MAKE) release-zip GOOS=darwin GOARCH=amd64
+	@$(MAKE) release-targz GOOS=darwin GOARCH=amd64
+
+release-darwin-arm64:
+	@$(MAKE) release-targz GOOS=darwin GOARCH=arm64
 
 release-darwin-386:
-	@$(MAKE) release-zip GOOS=darwin GOARCH=386
+	@$(MAKE) release-targz GOOS=darwin GOARCH=386
 
 release-targz: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 	@echo " * Creating tar.gz for $(GOOS)/$(GOARCH)"
@@ -77,15 +85,10 @@ release-zip: build $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)
 	@echo " * Creating zip for $(GOOS)/$(GOARCH)"
 	cd $(ARTIFACTS_DIR) && zip -9 $(RELEASE_DIR)/go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH).zip go-nginx-oauth2-adapter_$(GOOS)_$(GOARCH)/*
 
-release-files: release-windows-386 release-windows-amd64 release-linux-386 release-linux-amd64 release-darwin-386 release-darwin-amd64
+release-files: release-windows-386 release-windows-amd64 release-windows-arm64 release-linux-386 release-linux-amd64 release-linux-arm64 release-darwin-386 release-darwin-amd64 release-darwin-arm64
 
 release-upload: release-files
 	ghr -u $(GITHUB_USERNAME) --draft --replace v$(VERSION) $(RELEASE_DIR)
-
-$(ARCHIVER):
-	mkdir -p $(shell dirname $(ARCHIVER))
-	wget -O $(ARCHIVER) https://github.com/mholt/archiver/releases/download/v2.0/archiver_$(shell go env GOOS)_$(shell go env GOARCH)
-	chmod 755 $(ARCHIVER)
 
 test:
 	go test -v -race ./...
