@@ -17,7 +17,7 @@ type loggingResponseWriter interface {
 // responseLogger is wrapper of http.ResponseWriter that keeps track of its HTTP
 // status code and body size
 //
-// steel from https://github.com/gorilla/handlers/blob/master/handlers.go
+// steal from https://github.com/gorilla/handlers/blob/master/handlers.go
 type responseLogger struct {
 	w      http.ResponseWriter
 	status int

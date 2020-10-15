@@ -25,7 +25,7 @@ func getConfigString(configFile map[string]interface{}, key string, envName stri
 }
 
 // base64Decode decodes the Base64url encoded string
-// steel from https://github.com/golang/oauth2/blob/master/jws/jws.go
+// steal from https://github.com/golang/oauth2/blob/master/jws/jws.go
 func base64Decode(s string) ([]byte, error) {
 	// add back missing padding
 	switch len(s) % 4 {
