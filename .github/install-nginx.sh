@@ -2,10 +2,10 @@
 
 set -eux
 
-NGINX_VERSION=1.19.1
+NGINX_VERSION=1.19.3
 CURRENT=$(cd "$(dirname "$0")" && pwd)
 
-echo "::add-path::$CURRENT/nginx/sbin"
+echo "$CURRENT/nginx/sbin" >> "$GITHUB_PATH"
 
 if "$CURRENT/nginx/sbin/nginx" -v 2>&1 | grep -F "$NGINX_VERSION"; then
     : "nginx $NGINX_VERSION is already installed. nothing to do"

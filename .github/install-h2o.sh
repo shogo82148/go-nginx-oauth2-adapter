@@ -5,7 +5,7 @@ set -eux
 CURRENT=$(cd "$(dirname "$0")" && pwd)
 H2O_VERSION=2.2.6
 
-echo "::add-path::$CURRENT/h2o/bin"
+echo "$CURRENT/h2o/bin" >> "$GITHUB_PATH"
 
 if "$CURRENT/h2o/bin/h2o" --version | grep -F "h2o version $H2O_VERSION"; then
     : "h2o version $H2O_VERSION is already installed. nothing to do."
