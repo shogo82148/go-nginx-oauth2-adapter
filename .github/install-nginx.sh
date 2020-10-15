@@ -2,7 +2,7 @@
 
 set -eux
 
-NGINX_VERSION=1.19.1
+NGINX_VERSION=1.19.3
 CURRENT=$(cd "$(dirname "$0")" && pwd)
 
 echo "::add-path::$CURRENT/nginx/sbin"
