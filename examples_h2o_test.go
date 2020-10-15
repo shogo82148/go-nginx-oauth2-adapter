@@ -47,7 +47,7 @@ func TestH2O(t *testing.T) {
 
 	c := NewConfig()
 	c.Providers = map[string]map[string]interface{}{
-		"development": map[string]interface{}{},
+		"development": {},
 	}
 	s, err := NewServer(*c)
 	if err != nil {
