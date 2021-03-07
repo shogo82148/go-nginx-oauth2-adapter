@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -17,8 +18,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Version is the version of go-nginx-oauth2-adapter.
-const Version = "0.4.2"
+// these variable is set by goreleaser
+var version = "main" // .Version
+var commit = "HEAD"  // .ShortCommit
 
 // Main starts the go-nginx-oauth2-adapter server.
 func Main(args []string) int {
@@ -48,7 +50,10 @@ func Main(args []string) int {
 	}
 
 	if showVersion {
-		fmt.Println("go-nginx-oauth2-adapter", Version)
+		fmt.Printf(
+			"go-nginx-oauth2-adapter version %s(rev %s) %s/%s (built by %s)\n",
+			version, commit, runtime.GOOS, runtime.GOARCH, runtime.Version(),
+		)
 		return 0
 	}
 
