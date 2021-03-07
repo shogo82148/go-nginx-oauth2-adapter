@@ -1,0 +1,108 @@
+# This is an example .goreleaser.yml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: "cli-amd64"
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+    main: ./cli/go-nginx-oauth2-adapter/main.go
+    binary: go-nginx-oauth2-adapter
+    ldflags:
+      - -s -w
+      - -X github.com/shogo82148/go-nginx-oauth2-adapter.version={{.Version}}
+      - -X github.com/shogo82148/go-nginx-oauth2-adapter.commit={{.ShortCommit}}
+  - id: "cli-arm64"
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - arm64
+    main: ./cli/go-nginx-oauth2-adapter/main.go
+    binary: go-nginx-oauth2-adapter
+    ldflags:
+      - -s -w
+      - -X github.com/shogo82148/go-nginx-oauth2-adapter.version={{.Version}}
+      - -X github.com/shogo82148/go-nginx-oauth2-adapter.commit={{.ShortCommit}}
+archives:
+  - builds:
+      - "cli-amd64"
+      - "cli-arm64"
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+nfpms:
+  - id: package-amd64
+    builds:
+      - cli-amd64
+    package_name: go-nginx-oauth2-adapter
+    homepage: https://github.com/shogo82148/go-nginx-oauth2-adapter/
+    maintainer: Ichinose Shogo <shogo82148@gmail.com>
+    description: Add oauth2 authentication layer with ngx_http_auth_request_module
+    license: MIT
+    formats:
+      - apk
+      - deb
+      - rpm
+    release: 1
+    epoch: 0
+    bindir: /usr/bin
+  - id: package-arm64
+    builds:
+      - cli-arm64
+    package_name: go-nginx-oauth2-adapter
+    homepage: https://github.com/shogo82148/go-nginx-oauth2-adapter/
+    maintainer: Ichinose Shogo <shogo82148@gmail.com>
+    description: Add oauth2 authentication layer with ngx_http_auth_request_module
+    license: MIT
+    formats:
+      - apk
+      - deb
+      - rpm
+    release: 1
+    epoch: 0
+    bindir: /usr/bin
+
+blobs:
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [package-amd64]
+    folder: amazonlinux/2/x86_64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [package-arm64]
+    folder: amazonlinux/2/aarch64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [package-amd64]
+    folder: centos/7/x86_64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [package-arm64]
+    folder: centos/7/aarch64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [package-amd64]
+    folder: centos/8/x86_64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [package-arm64]
+    folder: centos/8/aarch64/go-nginx-oauth2-adapter

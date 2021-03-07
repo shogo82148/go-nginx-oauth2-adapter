@@ -1,6 +1,1 @@
-/artifacts/
-/release/
-/vendor/
-/glide*
-/archiver*
-/.mod/
+/dist/
