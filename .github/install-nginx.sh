@@ -2,7 +2,7 @@
 
 set -eux
 
-NGINX_VERSION=1.19.3
+NGINX_VERSION=1.19.7
 CURRENT=$(cd "$(dirname "$0")" && pwd)
 
 echo "$CURRENT/nginx/sbin" >> "$GITHUB_PATH"
