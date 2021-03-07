@@ -121,7 +121,7 @@ func (c *CookieConfig) Options() (*sessions.Options, error) {
 	if c == nil {
 		return &sessions.Options{}, nil
 	}
-	sameSite := http.SameSiteDefaultMode
+	var sameSite http.SameSite
 	switch strings.ToLower(c.SameSite) {
 	case "", "default":
 		sameSite = http.SameSiteDefaultMode
