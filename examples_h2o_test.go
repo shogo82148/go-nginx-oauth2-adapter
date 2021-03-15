@@ -49,6 +49,13 @@ func TestH2O(t *testing.T) {
 	c.Providers = map[string]map[string]interface{}{
 		"development": {},
 	}
+	c.Cookie = &CookieConfig{
+		Path:     "/",
+		MaxAge:   60 * 60 * 24 * 3,
+		Secure:   false,
+		HTTPOnly: true,
+		SameSite: "lax",
+	}
 	s, err := NewServer(*c)
 	if err != nil {
 		t.Error(err)

@@ -1,7 +1,9 @@
 package adapter
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -32,9 +34,10 @@ type CookieConfig struct {
 	// MaxAge=0 means no 'Max-Age' attribute specified.
 	// MaxAge<0 means delete cookie now, equivalently 'Max-Age: 0'.
 	// MaxAge>0 means Max-Age attribute present and given in seconds.
-	MaxAge   int  `yaml:"max_age" json:"max_age"`
-	Secure   bool `yaml:"secure" json:"secure"`
-	HTTPOnly bool `yaml:"http_only" json:"http_only"`
+	MaxAge   int    `yaml:"max_age" json:"max_age"`
+	Secure   bool   `yaml:"secure" json:"secure"`
+	HTTPOnly bool   `yaml:"http_only" json:"http_only"`
+	SameSite string `yaml:"same_site" json:"same_site"`
 }
 
 // NewConfig returns a new config.
@@ -46,8 +49,11 @@ func NewConfig() *Config {
 		Providers:          map[string]map[string]interface{}{},
 		AppRefreshInterval: "24h",
 		Cookie: &CookieConfig{
-			Path:   "/",
-			MaxAge: 60 * 60 * 24 * 3,
+			Path:     "/",
+			MaxAge:   60 * 60 * 24 * 3,
+			Secure:   true,
+			HTTPOnly: true,
+			SameSite: "lax",
 		},
 	}
 }
@@ -111,9 +117,22 @@ func (c *Config) LoadEnv() error {
 }
 
 // Options returns the session config.
-func (c *CookieConfig) Options() *sessions.Options {
+func (c *CookieConfig) Options() (*sessions.Options, error) {
 	if c == nil {
-		return &sessions.Options{}
+		return &sessions.Options{}, nil
+	}
+	var sameSite http.SameSite
+	switch strings.ToLower(c.SameSite) {
+	case "", "default":
+		sameSite = http.SameSiteDefaultMode
+	case "lax":
+		sameSite = http.SameSiteLaxMode
+	case "strict":
+		sameSite = http.SameSiteStrictMode
+	case "none":
+		sameSite = http.SameSiteNoneMode
+	default:
+		return nil, fmt.Errorf("unknown same site option: %s", c.SameSite)
 	}
 	return &sessions.Options{
 		Path:     c.Path,
@@ -121,5 +140,6 @@ func (c *CookieConfig) Options() *sessions.Options {
 		MaxAge:   c.MaxAge,
 		Secure:   c.Secure,
 		HttpOnly: c.HTTPOnly,
-	}
+		SameSite: sameSite,
+	}, nil
 }

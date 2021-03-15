@@ -10,7 +10,7 @@ a golang port for [sorah/nginx_omniauth_adapter](https://github.com/sorah/nginx_
 
 ## USAGE
 
-``` bash
+```bash
 $ go get github.com/shogo82148/go-nginx-oauth2-adapter/cli/go-nginx-oauth2-adapter
 $ go-nginx-oauth2-adapter
 ```
@@ -19,7 +19,7 @@ $ go-nginx-oauth2-adapter
 
 The example of configuration file.
 
-``` yaml
+```yaml
 address: ":18081" # listen address
 
 # secret tokens to authenticate/encrypt cookie.
@@ -34,12 +34,15 @@ session_name: go-nginx-oauth2-session
 app_refresh_interval: 24h
 
 # cookie settings for saving session
+# the following settings are default value.
+# we recommend to use this settings.
 cookie:
   path: /
   domain:
-  max_age: 0
-  secure: true # default: false. It is recommended to set true.
-  http_only: true # default: false. It is recommended to set true.
+  max_age: 259200 # 259200 seconds = 3 days
+  secure: true
+  http_only: true
+  same_site: "lax" # valid values are "default", "lax", "strict", "none"
 
 providers:
   # development: {} # For test.

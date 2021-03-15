@@ -113,7 +113,11 @@ func NewServer(config Config) (*Server, error) {
 		}
 	}
 	store := sessions.NewCookieStore(secrets...)
-	store.Options = config.Cookie.Options()
+	opt, err := config.Cookie.Options()
+	if err != nil {
+		return nil, err
+	}
+	store.Options = opt
 	s.SessionStore = store
 
 	if s.Config.AppRefreshInterval == "" {
