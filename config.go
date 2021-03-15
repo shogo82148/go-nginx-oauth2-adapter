@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/goccy/go-yaml"
 	"github.com/gorilla/sessions"
-	"gopkg.in/yaml.v2"
 )
 
 // Config is a configration for go-nginx-oauth2-adapter.
