@@ -2,7 +2,7 @@ package adapter
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"os"
@@ -81,7 +81,10 @@ func TestNginx(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
-	b, _ := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if string(b) != "Hello, client\n" {
 		t.Errorf("want Hello, client, got %s", string(b))
 	}

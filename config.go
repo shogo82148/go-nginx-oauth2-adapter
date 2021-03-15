@@ -2,7 +2,6 @@ package adapter
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -60,7 +59,7 @@ func NewConfig() *Config {
 
 // LoadYaml loads the config from yaml file.
 func (c *Config) LoadYaml(filename string) error {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return err
 	}

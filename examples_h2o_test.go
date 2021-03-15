@@ -2,7 +2,7 @@ package adapter
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"os"
@@ -93,7 +93,10 @@ func TestH2O(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
-	b, _ := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
 	fmt.Fprintln(os.Stderr, string(b))
 	if string(b) != "Hello, client\n" {
 		t.Errorf("want Hello, client, got %s", string(b))
