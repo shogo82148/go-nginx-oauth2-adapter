@@ -3,6 +3,7 @@ package adapter
 import (
 	"context"
 	"encoding/hex"
+	"errors"
 	"flag"
 	"fmt"
 	"net"
@@ -14,7 +15,7 @@ import (
 	"time"
 
 	"github.com/gorilla/securecookie"
-	"github.com/lestrrat-go/server-starter/listener"
+	"github.com/shogo82148/server-starter/listener"
 	"github.com/sirupsen/logrus"
 )
 
@@ -149,14 +150,20 @@ func waitSignal() {
 }
 
 func getListener(c *Config) (net.Listener, error) {
-	listeners, err := listener.ListenAll()
-	if err != nil && err != listener.ErrNoListeningTarget {
-		panic(err)
+	ports, err := listener.Ports()
+	if err != nil {
+		if errors.Is(err, listener.ErrNoListeningTarget) {
+			// Fallback if not running under Server::Starter
+			return net.Listen("tcp", c.Address)
+		}
+		return nil, err
 	}
-	if err != listener.ErrNoListeningTarget {
-		return listeners[0], nil
+	listeners, err := ports.ListenAll(context.Background())
+	if err != nil {
+		return nil, err
 	}
-
-	// Fallback if not running under Server::Starter
-	return net.Listen("tcp", c.Address)
+	if len(listeners) == 0 {
+		return nil, errors.New("running under Server::Starter but no port found")
+	}
+	return listeners[0], nil
 }
