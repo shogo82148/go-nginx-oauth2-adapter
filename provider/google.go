@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/mendsley/gojwk"
@@ -23,7 +22,6 @@ type providerConfigGoogle struct {
 	enabledProfile bool
 	restrictions   []string
 
-	mu      sync.RWMutex
 	jwksuri googleJWKSURI
 }
 type googleOpenIDConfiguration struct {
