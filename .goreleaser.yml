@@ -109,16 +109,16 @@ blobs:
   - provider: s3
     bucket: shogo82148-rpm-temporary
     ids: [package-amd64]
-    folder: almalinux/8/x86_64/go-server-starter
+    folder: almalinux/8/x86_64/go-nginx-oauth2-adapter
   - provider: s3
     bucket: shogo82148-rpm-temporary
     ids: [package-arm64]
-    folder: almalinux/8/aarch64/go-server-starter
+    folder: almalinux/8/aarch64/go-nginx-oauth2-adapter
   - provider: s3
     bucket: shogo82148-rpm-temporary
     ids: [package-amd64]
-    folder: rockylinux/8/x86_64/go-server-starter
+    folder: rockylinux/8/x86_64/go-nginx-oauth2-adapter
   - provider: s3
     bucket: shogo82148-rpm-temporary
     ids: [package-arm64]
-    folder: rockylinux/8/aarch64/go-server-starter
+    folder: rockylinux/8/aarch64/go-nginx-oauth2-adapter
