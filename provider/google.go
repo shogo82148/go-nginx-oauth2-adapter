@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/mendsley/gojwk"
 	adapter "github.com/shogo82148/go-nginx-oauth2-adapter"
 	"golang.org/x/oauth2"
