@@ -3,7 +3,7 @@ module github.com/shogo82148/go-nginx-oauth2-adapter
 go 1.16
 
 require (
-	github.com/goccy/go-yaml v1.9.6
+	github.com/goccy/go-yaml v1.11.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/context v1.1.1
 	github.com/gorilla/securecookie v1.1.1
