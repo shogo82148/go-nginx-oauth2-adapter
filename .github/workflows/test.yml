@@ -10,20 +10,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: "1.16"
       - name: Check out code into the Go module directory
         uses: actions/checkout@v3
 
-      - name: restore go.mod cache
-        uses: actions/cache@v2
+      - name: Set up Go
+        uses: actions/setup-go@v4
         with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          go-version-file: "go.mod"
 
       # - name: restore h2o binary
       #   uses: actions/cache@v2
@@ -58,9 +51,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
-          go-version: "1.16"
+          go-version-file: "go.mod"
       - name: Check GoReleaser configure
         uses: goreleaser/goreleaser-action@v4
         with:

@@ -29,6 +29,7 @@ func testStopH2O(cmd *exec.Cmd) {
 }
 
 func TestH2O(t *testing.T) {
+	t.Skip("h2o doesn't work with OpenSSL v3.")
 	if os.Getenv("CI") == "" {
 		t.Log("SKIP in not CI environment. if you want this test, execute `CI=1 go test .`.")
 		return
