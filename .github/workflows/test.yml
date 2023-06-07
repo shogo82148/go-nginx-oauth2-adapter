@@ -25,11 +25,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: restore h2o binary
-        uses: actions/cache@v2
-        with:
-          path: .github/h2o
-          key: ${{ runner.os }}-h2o-${{ hashFiles('.github/install-h2o.sh') }}
+      # - name: restore h2o binary
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: .github/h2o
+      #     key: ${{ runner.os }}-h2o-${{ hashFiles('.github/install-h2o.sh') }}
 
       - name: restore nginx binary
         uses: actions/cache@v2
@@ -37,8 +37,10 @@ jobs:
           path: .github/nginx
           key: ${{ runner.os }}-nginx-${{ hashFiles('.github/install-nginx.sh') }}
 
-      - name: install h2o for test
-        run: .github/install-h2o.sh
+      # FIXME: h2o doesn't work with OpenSSL v3.
+      # - name: install h2o for test
+      #   run: .github/install-h2o.sh
+
       - name: install nginx for test
         run: .github/install-nginx.sh
 
