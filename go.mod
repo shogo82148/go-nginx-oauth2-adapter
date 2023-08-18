@@ -12,7 +12,7 @@ require (
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 	github.com/shogo82148/server-starter/listener v1.0.0
 	github.com/sirupsen/logrus v1.9.3
-	golang.org/x/oauth2 v0.10.0
+	golang.org/x/oauth2 v0.11.0
 )
 
 require (
@@ -22,8 +22,8 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
-	golang.org/x/net v0.12.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/net v0.14.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
