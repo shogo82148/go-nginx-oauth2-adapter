@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/goccy/go-yaml v1.11.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/gorilla/context v1.1.1
+	github.com/gorilla/context v1.1.2
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.2.2
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.2.0 // indirect
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
