@@ -1,6 +1,6 @@
 module github.com/shogo82148/go-nginx-oauth2-adapter
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/goccy/go-yaml v1.11.2
@@ -12,7 +12,7 @@ require (
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 	github.com/shogo82148/server-starter/listener v1.0.0
 	github.com/sirupsen/logrus v1.9.4
-	golang.org/x/oauth2 v0.27.0
+	golang.org/x/oauth2 v0.36.0
 )
 
 require (
