@@ -7,7 +7,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/context v1.1.2
 	github.com/gorilla/securecookie v1.1.2
-	github.com/gorilla/sessions v1.2.2
+	github.com/gorilla/sessions v1.4.0
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 	github.com/shogo82148/server-starter/listener v1.0.0
