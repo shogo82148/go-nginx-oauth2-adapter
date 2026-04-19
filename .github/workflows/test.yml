@@ -57,5 +57,5 @@ jobs:
       - name: Check GoReleaser configure
         uses: goreleaser/goreleaser-action@v7
         with:
-          version: latest
+          version: "~> v2"
           args: check

@@ -1,5 +1,6 @@
 # This is an example .goreleaser.yml file with some sane defaults.
 # Make sure to check the documentation at http://goreleaser.com
+version: 2
 before:
   hooks:
     - go mod download
@@ -35,23 +36,19 @@ builds:
       - -X github.com/shogo82148/go-nginx-oauth2-adapter.version={{.Version}}
       - -X github.com/shogo82148/go-nginx-oauth2-adapter.commit={{.ShortCommit}}
 archives:
-  - builds:
+  - ids:
       - "cli-amd64"
       - "cli-arm64"
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
+  use: github-native
 
 nfpms:
   - id: package-amd64
-    builds:
+    ids:
       - cli-amd64
     package_name: go-nginx-oauth2-adapter
     homepage: https://github.com/shogo82148/go-nginx-oauth2-adapter/
@@ -66,7 +63,7 @@ nfpms:
     epoch: 0
     bindir: /usr/bin
   - id: package-arm64
-    builds:
+    ids:
       - cli-arm64
     package_name: go-nginx-oauth2-adapter
     homepage: https://github.com/shogo82148/go-nginx-oauth2-adapter/
@@ -82,43 +79,52 @@ nfpms:
     bindir: /usr/bin
 
 blobs:
+  # Amazon Linux 2
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-amd64]
-    folder: amazonlinux/2/x86_64/go-nginx-oauth2-adapter
+    ids: [ package-amd64 ]
+    directory: amazonlinux/2/x86_64/go-nginx-oauth2-adapter
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-arm64]
-    folder: amazonlinux/2/aarch64/go-nginx-oauth2-adapter
+    ids: [ package-arm64 ]
+    directory: amazonlinux/2/aarch64/go-nginx-oauth2-adapter
+
+  # CentOS 7
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-amd64]
-    folder: centos/7/x86_64/go-nginx-oauth2-adapter
+    ids: [ package-amd64 ]
+    directory: centos/7/x86_64/go-nginx-oauth2-adapter
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-arm64]
-    folder: centos/7/aarch64/go-nginx-oauth2-adapter
+    ids: [ package-arm64 ]
+    directory: centos/7/aarch64/go-nginx-oauth2-adapter
+
+  # CentOS 8
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-amd64]
-    folder: centos/8/x86_64/go-nginx-oauth2-adapter
+    ids: [ package-amd64 ]
+    directory: centos/8/x86_64/go-nginx-oauth2-adapter
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-arm64]
-    folder: centos/8/aarch64/go-nginx-oauth2-adapter
+    ids: [ package-arm64 ]
+    directory: centos/8/aarch64/go-nginx-oauth2-adapter
+
+  # AlmaLinux 8
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-amd64]
-    folder: almalinux/8/x86_64/go-nginx-oauth2-adapter
+    ids: [ package-amd64 ]
+    directory: almalinux/8/x86_64/go-nginx-oauth2-adapter
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-arm64]
-    folder: almalinux/8/aarch64/go-nginx-oauth2-adapter
+    ids: [ package-arm64 ]
+    directory: almalinux/8/aarch64/go-nginx-oauth2-adapter
+
+  # Rocky Linux 8
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-amd64]
-    folder: rockylinux/8/x86_64/go-nginx-oauth2-adapter
+    ids: [ package-amd64 ]
+    directory: rockylinux/8/x86_64/go-nginx-oauth2-adapter
   - provider: s3
     bucket: shogo82148-rpm-temporary
-    ids: [package-arm64]
-    folder: rockylinux/8/aarch64/go-nginx-oauth2-adapter
+    ids: [ package-arm64 ]
+    directory: rockylinux/8/aarch64/go-nginx-oauth2-adapter
