@@ -119,6 +119,26 @@ blobs:
     ids: [ package-arm64 ]
     directory: almalinux/8/aarch64/go-nginx-oauth2-adapter
 
+  # AlmaLinux 9
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-amd64 ]
+    directory: almalinux/9/x86_64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-arm64 ]
+    directory: almalinux/9/aarch64/go-nginx-oauth2-adapter
+
+  # AlmaLinux 10
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-amd64 ]
+    directory: almalinux/10/x86_64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-arm64 ]
+    directory: almalinux/10/aarch64/go-nginx-oauth2-adapter
+
   # Rocky Linux 8
   - provider: s3
     bucket: shogo82148-rpm-temporary
@@ -128,3 +148,23 @@ blobs:
     bucket: shogo82148-rpm-temporary
     ids: [ package-arm64 ]
     directory: rockylinux/8/aarch64/go-nginx-oauth2-adapter
+
+  # Rocky Linux 9
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-amd64 ]
+    directory: rockylinux/9/x86_64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-arm64 ]
+    directory: rockylinux/9/aarch64/go-nginx-oauth2-adapter
+
+  # Rocky Linux 10
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-amd64 ]
+    directory: rockylinux/10/x86_64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-arm64 ]
+    directory: rockylinux/10/aarch64/go-nginx-oauth2-adapter
