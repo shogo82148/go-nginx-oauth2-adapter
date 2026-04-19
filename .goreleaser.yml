@@ -89,6 +89,16 @@ blobs:
     ids: [ package-arm64 ]
     directory: amazonlinux/2/aarch64/go-nginx-oauth2-adapter
 
+  # Amazon Linux 2023
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-amd64 ]
+    directory: amazonlinux/2023/x86_64/go-nginx-oauth2-adapter
+  - provider: s3
+    bucket: shogo82148-rpm-temporary
+    ids: [ package-arm64 ]
+    directory: amazonlinux/2023/aarch64/go-nginx-oauth2-adapter
+
   # CentOS 7
   - provider: s3
     bucket: shogo82148-rpm-temporary
