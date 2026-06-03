@@ -23,7 +23,7 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@acca2b1b2070338fb9fd1ca27ecee81d687e58e5 # v6.1.2
+        uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
         with:
           aws-region: ap-northeast-1
           role-to-assume: arn:aws:iam::445285296882:role/rpm-repository-users-OAuth2AdapterRole-1PQI0J2VLMAAR
