@@ -1,6 +1,8 @@
 module github.com/shogo82148/go-nginx-oauth2-adapter
 
-go 1.25.0
+go 1.26.0
+
+toolchain go1.27.0
 
 require (
 	github.com/goccy/go-yaml v1.19.2
@@ -11,11 +13,11 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 	github.com/shogo82148/server-starter/listener v1.0.0
-	github.com/sirupsen/logrus v1.10.0
+	github.com/sirupsen/logrus v1.10.1
 	golang.org/x/oauth2 v0.36.0
 )
 
 require (
-	cloud.google.com/go/compute/metadata v0.3.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
+	cloud.google.com/go/compute/metadata v0.9.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 )
