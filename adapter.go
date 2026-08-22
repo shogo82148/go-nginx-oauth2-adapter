@@ -72,14 +72,7 @@ func NewServer(config Config) (*Server, error) {
 	for i, secret := range s.Config.Secrets {
 		isAuthKey := i%2 == 0
 		if secret == nil {
-			if isAuthKey {
-				logrus.Warn("The session authentication key is empty. you should set secure random hex string.")
-				secrets[i] = []byte("dummy-session-authentication-key")
-				if s.Config.ConfigTest {
-					return nil, errors.New("shogo82148/go-nginx-oauth2-adapter: the session authentication key is empty")
-				}
-			}
-			continue
+			return nil, errors.New("shogo82148/go-nginx-oauth2-adapter: the session authentication key is empty")
 		}
 		var err error
 		if isAuthKey {
@@ -106,11 +99,7 @@ func NewServer(config Config) (*Server, error) {
 		}
 	}
 	if len(secrets) == 0 {
-		logrus.Warn("The session authentication key is empty. you should set secure random hex string.")
-		secrets = append(secrets, []byte("dummy-session-authentication-key"))
-		if s.Config.ConfigTest {
-			return nil, errors.New("adapter: the session authentication key is empty")
-		}
+		return nil, errors.New("adapter: the session authentication key is empty")
 	}
 	store := sessions.NewCookieStore(secrets...)
 	opt, err := config.Cookie.Options()
