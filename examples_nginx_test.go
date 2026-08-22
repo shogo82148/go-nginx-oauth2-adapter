@@ -46,6 +46,7 @@ func TestNginx(t *testing.T) {
 	c.Providers = map[string]map[string]interface{}{
 		"development": {},
 	}
+	c.Secrets = []*string{new("5c9ea31b400099a521f934f8a4c2c88758ca59e0a34479775aea86404921658e"), new("5c9ea31b400099a521f934f8a4c2c88758ca59e0a34479775aea86404921658e")}
 	c.Cookie = &CookieConfig{
 		Path:     "/",
 		MaxAge:   60 * 60 * 24 * 3,
